@@ -1,0 +1,32 @@
+<div class="px-5 pt-8 pb-6 max-w-lg mx-auto">
+  <h1 class="font-display text-2xl text-[var(--color-text)]">Plan de salle</h1>
+  <p class="text-xs text-[var(--color-text-muted)] mb-6">Touchez une table pour réserver votre place</p>
+
+  @if (honorTable()) {
+    <div class="bg-gradient-to-b from-[var(--color-gold)]/15 to-transparent border border-[var(--color-gold)] rounded-2xl p-6 text-center mb-4">
+      <div class="text-3xl mb-2">👑</div>
+      <p class="font-display text-[var(--color-gold)] text-lg">Table d'Honneur</p>
+      <p class="text-xs text-[var(--color-text-muted)]">Joelson &amp; Marjorie</p>
+    </div>
+  }
+
+  @if (!loading()) {
+    <div class="grid grid-cols-2 gap-3">
+      @for (table of tables(); track table.id) {
+        <a
+          [routerLink]="['/guest/plan', table.id]"
+          class="rounded-2xl border-2 bg-[var(--color-surface)] p-4 flex flex-col items-center gap-1 transition-transform active:scale-95"
+          [class]="statusClass(table)"
+        >
+          <div class="w-11 h-11 rounded-full border-2 flex items-center justify-center text-xs font-semibold" [class]="statusClass(table)">
+            {{ table.reservedCount }}/{{ table.totalSeats }}
+          </div>
+          <p class="font-display text-sm text-[var(--color-text)] mt-1">{{ table.name }}</p>
+          <p class="text-[10px] text-[var(--color-text-muted)]">
+            {{ table.isMyTable ? 'Votre table' : table.freeCount + ' libres' }}
+          </p>
+        </a>
+      }
+    </div>
+  }
+</div>

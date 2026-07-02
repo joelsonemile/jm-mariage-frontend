@@ -1,0 +1,7 @@
+<button type="button" [class]="classes" (click)="onClick()">
+  @if (seat.status === 'taken' && !selected) {
+    ✕
+  } @else {
+    {{ seat.seatNumber }}
+  }
+</button>

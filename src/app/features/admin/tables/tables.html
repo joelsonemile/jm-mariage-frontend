@@ -1,0 +1,35 @@
+<div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
+  <h1 class="font-display text-2xl text-[var(--color-text)]">Tables</h1>
+  <p class="text-xs text-[var(--color-text-muted)] mb-6">Plan d'occupation par table</p>
+
+  @if (!loading()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      @for (t of tables(); track t.id) {
+        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-display text-[var(--color-text)]">{{ t.name }}</p>
+            <p class="text-xs text-[var(--color-text-muted)]">{{ t.reservedCount }}/{{ t.totalSeats }}</p>
+          </div>
+
+          @if (!t.guests.length) {
+            <p class="text-xs text-[var(--color-text-muted)] italic">Aucune réservation</p>
+          } @else {
+            <div class="flex flex-col gap-1.5">
+              @for (g of t.guests; track g._id) {
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[var(--color-text-soft)]">#{{ g.seatNumber }} {{ g.guest.fullName }}</span>
+                  <span
+                    class="rounded-full px-2 py-0.5"
+                    [class]="g.status === 'validated' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' : 'bg-[var(--color-gold)]/20 text-[var(--color-gold)]'"
+                  >
+                    {{ g.status === 'validated' ? 'Validée' : 'En attente' }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

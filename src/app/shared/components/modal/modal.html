@@ -1,0 +1,14 @@
+@if (open) {
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="onBackdropClick()"></div>
+
+    <div
+      class="relative w-full sm:max-w-md bg-[var(--color-surface)] border border-[var(--color-gold)]/40 rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 animate-[fadeIn_0.2s_ease-out]"
+    >
+      @if (heading) {
+        <h3 class="font-display text-xl text-[var(--color-text)] mb-4">{{ heading }}</h3>
+      }
+      <ng-content></ng-content>
+    </div>
+  </div>
+}

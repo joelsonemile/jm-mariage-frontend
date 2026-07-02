@@ -1,0 +1,125 @@
+<div class="min-h-screen bg-[var(--color-bg)] flex flex-col px-6 py-8">
+  <a routerLink="/" class="text-sm text-[var(--color-text-muted)] flex items-center gap-1 mb-8">
+    ‹ Retour à l'accueil
+  </a>
+
+  <div class="text-center mb-8">
+    <h1 class="font-display text-3xl text-[var(--color-gold)]">JM</h1>
+    <p class="font-accent text-[var(--color-text-soft)]">Joelson &amp; Marjorie</p>
+  </div>
+
+  <div class="max-w-sm w-full mx-auto bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-5">
+    <div class="flex bg-[var(--color-bg-secondary)] rounded-full p-1 mb-6">
+      <button
+        type="button"
+        (click)="setTab('login')"
+        class="flex-1 text-sm py-2 rounded-full transition-colors"
+        [class]="tab() === 'login' ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold' : 'text-[var(--color-text-muted)]'"
+      >
+        Se connecter
+      </button>
+      <button
+        type="button"
+        (click)="setTab('register')"
+        class="flex-1 text-sm py-2 rounded-full transition-colors"
+        [class]="tab() === 'register' ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold' : 'text-[var(--color-text-muted)]'"
+      >
+        Créer un compte
+      </button>
+    </div>
+
+    @if (tab() === 'login') {
+      <form (ngSubmit)="submitLogin()" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">EMAIL</label>
+          <input
+            type="email"
+            required
+            [(ngModel)]="loginForm.email"
+            name="loginEmail"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          />
+        </div>
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">MOT DE PASSE</label>
+          <input
+            type="password"
+            required
+            [(ngModel)]="loginForm.password"
+            name="loginPassword"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          />
+        </div>
+
+        <app-button type="submit" [loading]="loading()">Se connecter</app-button>
+
+        <a routerLink="/auth/forgot-password" class="text-center text-xs text-[var(--color-text-muted)]">Mot de passe oublié ?</a>
+      </form>
+    } @else {
+      <form (ngSubmit)="submitRegister()" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOM COMPLET</label>
+          <input
+            required
+            [(ngModel)]="registerForm.fullName"
+            name="fullName"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          />
+        </div>
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">EMAIL</label>
+          <input
+            type="email"
+            required
+            [(ngModel)]="registerForm.email"
+            name="email"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          />
+        </div>
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TÉLÉPHONE</label>
+          <input
+            required
+            [(ngModel)]="registerForm.phone"
+            name="phone"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          />
+        </div>
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">LIEN AVEC LE COUPLE</label>
+          <select
+            [(ngModel)]="registerForm.linkToCouple"
+            name="linkToCouple"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          >
+            @for (link of links; track link) {
+              <option [value]="link">{{ link }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">MOT DE PASSE</label>
+          <input
+            type="password"
+            required
+            [(ngModel)]="registerForm.password"
+            name="password"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          />
+        </div>
+        <div>
+          <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">CONFIRMER LE MOT DE PASSE</label>
+          <input
+            type="password"
+            required
+            [(ngModel)]="registerForm.confirmPassword"
+            name="confirmPassword"
+            class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+          />
+        </div>
+
+        <app-button type="submit" [loading]="loading()">Créer mon compte</app-button>
+      </form>
+    }
+  </div>
+</div>

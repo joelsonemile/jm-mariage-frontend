@@ -1,0 +1,100 @@
+<div class="px-5 pt-8 pb-6 max-w-lg mx-auto">
+  <p class="font-accent text-[var(--color-text-muted)]">Bienvenue,</p>
+  <h1 class="font-display text-3xl text-[var(--color-text)] mb-6">
+    {{ auth.user()?.fullName?.split(' ')?.[0] }} 💍
+  </h1>
+
+  @if (info()?.coupleMessage) {
+    <div class="bg-[var(--color-surface)] border border-[var(--color-gold)]/30 rounded-2xl p-4 mb-4 animate-fade-in-up">
+      <div class="text-xs text-[var(--color-gold)] flex items-center gap-1.5 mb-2 animate-heart-pulse">♡ MOT DES MARIÉS</div>
+      <p class="font-accent text-[var(--color-text-soft)] text-sm leading-relaxed">« {{ info()?.coupleMessage }} »</p>
+      <p class="text-right text-xs text-[var(--color-text-muted)] mt-2">— Joelson &amp; Marjorie</p>
+    </div>
+  }
+
+  <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4 mb-4 animate-fade-in-up delay-1">
+    <p class="text-sm text-[var(--color-text-soft)] mb-3">Confirmerez-vous votre présence ?</p>
+    <div class="flex gap-3">
+      <button
+        (click)="setRsvp('yes')"
+        class="flex-1 text-sm rounded-full py-2.5 font-semibold"
+        [class]="auth.user()?.rsvpStatus === 'yes' ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black' : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]'"
+      >
+        Je serai présent(e)
+      </button>
+      <button
+        (click)="setRsvp('no')"
+        class="flex-1 text-sm rounded-full py-2.5 font-semibold"
+        [class]="auth.user()?.rsvpStatus === 'no' ? 'bg-[var(--color-error)] text-white' : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]'"
+      >
+        Je ne pourrai pas
+      </button>
+    </div>
+  </div>
+
+  @if (!loading()) {
+    @if (!reservation()) {
+      <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 text-center">
+        <div class="text-3xl mb-2">📍</div>
+        <p class="font-display text-lg text-[var(--color-text)]">Aucune place réservée</p>
+        <p class="text-xs text-[var(--color-text-muted)] mb-4">Choisissez votre table parmi nos 12 tables Malagasy</p>
+        <a
+          routerLink="/guest/plan"
+          class="inline-flex items-center justify-center rounded-full font-semibold text-sm px-6 py-3 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black"
+        >
+          Choisir ma place
+        </a>
+      </div>
+    } @else if (reservation()!.status === 'pending') {
+      <div class="bg-[var(--color-surface)] border border-[var(--color-gold)]/30 rounded-2xl p-4">
+        <div class="text-xs text-[var(--color-gold)] flex items-center gap-1.5 mb-2">⏱ EN ATTENTE DE VALIDATION</div>
+        <p class="font-display text-lg text-[var(--color-text)]">{{ reservation()!.table.name }}</p>
+        <p class="font-display text-xl text-[var(--color-gold-bright)]">Place #{{ reservation()!.seatNumber }}</p>
+        <p class="text-xs text-[var(--color-text-muted)] mt-2">
+          Votre réservation a bien été enregistrée. Veuillez attendre la validation de l'administrateur pour télécharger votre ticket.
+        </p>
+        <div class="flex gap-3 mt-4">
+          <a routerLink="/guest/plan" class="flex-1 text-center text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">
+            Changer
+          </a>
+          <button (click)="showCancelConfirm.set(true)" class="flex-1 text-sm rounded-full py-2.5 border border-[var(--color-error)] text-[var(--color-error)]">
+            ✕ Annuler
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="relative bg-[var(--color-surface)] border border-[var(--color-gold)]/30 rounded-2xl p-4 text-center animate-ticket-in overflow-hidden">
+        <div class="pointer-events-none absolute -inset-1 rounded-2xl border border-[var(--color-gold)]/20 animate-glow-pulse"></div>
+        <div class="text-xs text-[var(--color-gold)] flex items-center justify-center gap-1.5 mb-2 animate-heart-pulse">✦ VOTRE PLACE</div>
+        <p class="font-display text-lg text-[var(--color-text)]">{{ reservation()!.table.name }}</p>
+        <p class="text-xs text-[var(--color-text-muted)] mb-3">{{ reservation()!.table.description }}</p>
+        <p class="font-display text-2xl text-[var(--color-gold-bright)] mb-4">Place #{{ reservation()!.seatNumber }}</p>
+
+        @if (ticket()) {
+          <app-qr-code
+            [dataUrl]="ticket()!.qrDataUrl"
+            [tableName]="reservation()!.table.name"
+            [seatNumber]="reservation()!.seatNumber"
+          ></app-qr-code>
+        }
+
+        @if (tableMates().length) {
+          <div class="text-left mt-4 border-t border-[var(--color-border)] pt-3">
+            <p class="text-xs text-[var(--color-text-muted)] mb-1">VOTRE TABLE</p>
+            <p class="text-sm text-[var(--color-text-soft)]">{{ tableMates().join(', ') }}</p>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<app-modal [open]="showCancelConfirm()" heading="Annuler la réservation ?" (closed)="showCancelConfirm.set(false)">
+  <p class="text-sm text-[var(--color-text-muted)] mb-5">Votre place sera immédiatement libérée pour les autres invités.</p>
+  <div class="flex gap-3">
+    <button (click)="showCancelConfirm.set(false)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">
+      Retour
+    </button>
+    <app-button variant="danger" (clicked)="confirmCancel()">Annuler la place</app-button>
+  </div>
+</app-modal>

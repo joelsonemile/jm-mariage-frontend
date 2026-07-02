@@ -1,0 +1,98 @@
+<div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <h1 class="font-display text-2xl text-[var(--color-text)]">Invités</h1>
+      <p class="text-xs text-[var(--color-text-muted)]">{{ guests().length }} inscrits</p>
+    </div>
+    <button (click)="showCreate.set(true)" class="text-xs bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black rounded-full px-4 py-2 font-semibold whitespace-nowrap">
+      + Ajouter
+    </button>
+  </div>
+
+  <input
+    [(ngModel)]="search"
+    name="search"
+    (ngModelChange)="onSearchChange()"
+    placeholder="Rechercher..."
+    class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-5 focus:border-[var(--color-gold)] outline-none"
+  />
+
+  @if (!loading()) {
+    <div class="flex flex-col gap-3">
+      @for (g of guests(); track g.id) {
+        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center justify-between gap-3">
+          <div>
+            <p class="text-sm font-semibold text-[var(--color-text)]">{{ g.fullName }}</p>
+            <p class="text-xs text-[var(--color-text-muted)]">{{ g.linkToCouple }} · {{ g.phone }}</p>
+            @if (g.reservation) {
+              <p class="text-xs text-[var(--color-gold)]">
+                Table {{ g.reservation.tableName }} · Place #{{ g.reservation.seatNumber }}
+                <span class="text-[var(--color-text-muted)]">({{ g.reservation.status === 'validated' ? 'Validée' : 'En attente' }})</span>
+              </p>
+            } @else {
+              <p class="text-xs text-[var(--color-text-muted)] italic">Aucune réservation</p>
+            }
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button (click)="openEdit(g)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
+            <button (click)="remove(g)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<app-modal [open]="!!editing()" heading="Modifier l'invité" (closed)="editing.set(null)">
+  <form (ngSubmit)="saveEdit()" class="flex flex-col gap-4">
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOM</label>
+      <input [(ngModel)]="editForm.fullName" name="editFullName" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TÉLÉPHONE</label>
+      <input [(ngModel)]="editForm.phone" name="editPhone" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">LIEN</label>
+      <select [(ngModel)]="editForm.linkToCouple" name="editLink" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
+        @for (link of links; track link) {
+          <option [value]="link">{{ link }}</option>
+        }
+      </select>
+    </div>
+    <div class="flex gap-3">
+      <button type="button" (click)="editing.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>
+      <app-button type="submit" [loading]="saving()">Enregistrer</app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal [open]="showCreate()" heading="Ajouter un invité" (closed)="showCreate.set(false)">
+  <form (ngSubmit)="createGuest()" class="flex flex-col gap-4">
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOM</label>
+      <input required [(ngModel)]="createForm.fullName" name="createFullName" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">EMAIL</label>
+      <input required type="email" [(ngModel)]="createForm.email" name="createEmail" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TÉLÉPHONE</label>
+      <input required [(ngModel)]="createForm.phone" name="createPhone" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">LIEN</label>
+      <select [(ngModel)]="createForm.linkToCouple" name="createLink" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
+        @for (link of links; track link) {
+          <option [value]="link">{{ link }}</option>
+        }
+      </select>
+    </div>
+    <div class="flex gap-3">
+      <button type="button" (click)="showCreate.set(false)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>
+      <app-button type="submit" [loading]="saving()">Créer</app-button>
+    </div>
+  </form>
+</app-modal>

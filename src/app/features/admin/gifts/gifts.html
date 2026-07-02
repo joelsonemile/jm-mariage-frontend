@@ -1,0 +1,29 @@
+<div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
+  <h1 class="font-display text-2xl text-[var(--color-text)]">Cadeaux</h1>
+  <p class="text-xs text-[var(--color-text-muted)] mb-6">Liste de cadeaux / cagnotte visible par les invités</p>
+
+  <div class="flex gap-2 mb-4">
+    <input
+      [(ngModel)]="newItem"
+      name="newItem"
+      (keyup.enter)="addItem()"
+      placeholder="Ex : Cagnotte lune de miel — cagnotte.fr/jm"
+      class="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+    />
+    <button (click)="addItem()" class="w-11 h-11 rounded-full bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold">+</button>
+  </div>
+
+  <div class="flex flex-col gap-2 mb-6">
+    @for (item of items(); track $index; let i = $index) {
+      <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 flex items-center justify-between">
+        <span class="text-sm text-[var(--color-text-soft)]">{{ item }}</span>
+        <button (click)="removeItem(i)" class="text-[var(--color-error)] text-sm">🗑</button>
+      </div>
+    }
+    @if (!items().length) {
+      <p class="text-sm text-[var(--color-text-muted)] italic">Aucun élément pour le moment.</p>
+    }
+  </div>
+
+  <app-button [loading]="saving()" (clicked)="save()">Enregistrer</app-button>
+</div>

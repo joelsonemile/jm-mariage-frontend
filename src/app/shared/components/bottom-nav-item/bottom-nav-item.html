@@ -1,0 +1,11 @@
+<a
+  [routerLink]="link"
+  routerLinkActive="text-[var(--color-gold)]"
+  [routerLinkActiveOptions]="{ exact: exact }"
+  class="flex flex-col items-center gap-1 text-[var(--color-text-muted)] py-2 px-3 transition-colors"
+>
+  <span class="w-5 h-5">
+    <ng-content></ng-content>
+  </span>
+  <span class="text-[10px] tracking-wide">{{ label }}</span>
+</a>

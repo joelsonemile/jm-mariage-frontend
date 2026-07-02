@@ -1,0 +1,29 @@
+<div class="flex flex-col items-center gap-3 w-full">
+  <div class="relative animate-ticket-in">
+    <div class="absolute -inset-3 rounded-2xl bg-[var(--color-gold)]/20 blur-xl animate-glow-pulse"></div>
+    <img
+      [src]="dataUrl"
+      alt="QR code de la réservation"
+      class="relative w-44 h-44 rounded-lg bg-white p-2 shadow-[0_0_30px_rgba(201,168,76,0.2)]"
+    />
+  </div>
+  <p class="text-xs text-[var(--color-text-muted)]">{{ caption }}</p>
+
+  <button
+    type="button"
+    (click)="download()"
+    [disabled]="downloading()"
+    class="w-full inline-flex items-center justify-center gap-2 rounded-full font-semibold text-sm px-6 py-3 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] transition-transform active:scale-95 disabled:opacity-60"
+  >
+    @if (downloading()) {
+      <span class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+      Préparation...
+    } @else {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+        <path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M4 20h16" stroke-linecap="round" />
+      </svg>
+      Télécharger mon ticket
+    }
+  </button>
+</div>

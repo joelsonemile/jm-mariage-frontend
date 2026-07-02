@@ -1,0 +1,41 @@
+<div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
+  <h1 class="font-display text-2xl text-[var(--color-text)] mb-6">Infos mariage</h1>
+
+  <form (ngSubmit)="save()" class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-5 flex flex-col gap-4">
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">DATE ET HEURE</label>
+      <input type="datetime-local" [(ngModel)]="form.date" name="date" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+      <p class="text-[11px] text-[var(--color-text-muted)] mt-2">
+        C'est cette date qui pilote le compte à rebours affiché aux invités.
+      </p>
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">LIBELLÉ DE LA DATE (généré automatiquement)</label>
+      <div class="w-full bg-[var(--color-bg-secondary)]/60 border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-gold-bright)]">
+        {{ dateLabelPreview }}
+      </div>
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">CÉRÉMONIE</label>
+      <input [(ngModel)]="form.ceremonyTime" name="ceremonyTime" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">LIEU</label>
+      <input [(ngModel)]="form.location" name="location" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TENUE</label>
+      <input [(ngModel)]="form.dressCode" name="dressCode" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">PROGRAMME (RÉSUMÉ)</label>
+      <input [(ngModel)]="form.programSummary" name="programSummary" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">MOT DES MARIÉS</label>
+      <textarea [(ngModel)]="form.coupleMessage" name="coupleMessage" rows="3" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none"></textarea>
+    </div>
+
+    <app-button type="submit" [loading]="saving()">Enregistrer</app-button>
+  </form>
+</div>

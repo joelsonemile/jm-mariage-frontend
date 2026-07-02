@@ -1,0 +1,48 @@
+<div class="px-5 pt-8 pb-6 max-w-lg mx-auto">
+  <h1 class="font-display text-2xl text-[var(--color-text)] mb-6">Mon profil</h1>
+
+  <form (ngSubmit)="save()" class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-5 flex flex-col gap-4">
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOM COMPLET</label>
+      <input
+        [(ngModel)]="form.fullName"
+        name="fullName"
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+      />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TÉLÉPHONE</label>
+      <input
+        [(ngModel)]="form.phone"
+        name="phone"
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+      />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">LIEN AVEC LE COUPLE</label>
+      <select
+        [(ngModel)]="form.linkToCouple"
+        name="linkToCouple"
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+      >
+        @for (link of links; track link) {
+          <option [value]="link">{{ link }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">EMAIL</label>
+      <input
+        [value]="auth.user()?.email"
+        disabled
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-muted)] outline-none"
+      />
+    </div>
+
+    <app-button type="submit" [loading]="loading()">Enregistrer</app-button>
+  </form>
+
+  <button (click)="logout()" class="w-full mt-4 text-sm rounded-full py-3 border border-[var(--color-error)] text-[var(--color-error)]">
+    ↪ Se déconnecter
+  </button>
+</div>

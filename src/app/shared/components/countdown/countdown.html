@@ -1,0 +1,20 @@
+<div class="flex items-center justify-center gap-3">
+  @for (unit of [
+    { value: timeLeft().days, label: 'JOURS', pulse: false },
+    { value: timeLeft().hours, label: 'HRES', pulse: false },
+    { value: timeLeft().minutes, label: 'MIN', pulse: false },
+    { value: timeLeft().seconds, label: 'SEC', pulse: true }
+  ]; track unit.label; let i = $index) {
+    <div
+      class="relative flex flex-col items-center bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-3 py-2 min-w-[58px] overflow-hidden animate-fade-in-up"
+      [style.animation-delay.ms]="i * 90"
+    >
+      <div class="pointer-events-none absolute inset-0 bg-[var(--color-gold)]/10 animate-glow-pulse" [style.animation-delay.ms]="i * 250"></div>
+      <span
+        class="relative font-display text-2xl text-[var(--color-gold-bright)] tabular-nums"
+        [class.animate-heart-pulse]="unit.pulse"
+      >{{ unit.value }}</span>
+      <span class="relative text-[10px] tracking-widest text-[var(--color-text-muted)] mt-1">{{ unit.label }}</span>
+    </div>
+  }
+</div>

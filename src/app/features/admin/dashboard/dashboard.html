@@ -1,0 +1,44 @@
+<div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
+  <h1 class="font-display text-2xl text-[var(--color-text)]">Tableau de bord</h1>
+  <p class="text-xs text-[var(--color-text-muted)] mb-6">Vue d'ensemble de la gestion du mariage.</p>
+
+  @if (stats(); as s) {
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+        <p class="font-display text-2xl text-[var(--color-gold)]">{{ s.totalGuests }}</p>
+        <p class="text-[10px] tracking-widest text-[var(--color-text-muted)]">INVITÉS</p>
+      </div>
+      <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+        <p class="font-display text-2xl text-[var(--color-gold)]">{{ s.pendingCount }}</p>
+        <p class="text-[10px] tracking-widest text-[var(--color-text-muted)]">EN ATTENTE</p>
+      </div>
+      <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+        <p class="font-display text-2xl text-[var(--color-gold)]">{{ s.validatedCount }}</p>
+        <p class="text-[10px] tracking-widest text-[var(--color-text-muted)]">VALIDÉES</p>
+      </div>
+      <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+        <p class="font-display text-2xl text-[var(--color-gold)]">{{ s.reservedSeats }}/{{ s.totalSeats }}</p>
+        <p class="text-[10px] tracking-widest text-[var(--color-text-muted)]">PLACES</p>
+      </div>
+    </div>
+  }
+
+  <div class="grid grid-cols-2 gap-3">
+    <a routerLink="/admin/reservations" class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+      <p class="text-sm font-semibold text-[var(--color-text)]">Réservations</p>
+      <p class="text-xs text-[var(--color-text-muted)]">Approuver, refuser, exporter</p>
+    </a>
+    <a routerLink="/admin/guests" class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+      <p class="text-sm font-semibold text-[var(--color-text)]">Invités</p>
+      <p class="text-xs text-[var(--color-text-muted)]">Modifier ou supprimer les invités</p>
+    </a>
+    <a routerLink="/admin/tables" class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+      <p class="text-sm font-semibold text-[var(--color-text)]">Tables</p>
+      <p class="text-xs text-[var(--color-text-muted)]">Visualiser les plans de table</p>
+    </a>
+    <a routerLink="/admin/infos" class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+      <p class="text-sm font-semibold text-[var(--color-text)]">Infos mariage</p>
+      <p class="text-xs text-[var(--color-text-muted)]">Voir les informations partagées</p>
+    </a>
+  </div>
+</div>
