@@ -1,5 +1,6 @@
 import { Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
 
 @Component({
   selector: 'app-qr-code',
@@ -13,6 +14,8 @@ export class QrCodeComponent {
   @Input() tableName = '';
   @Input() seatNumber: number | null = null;
   @Input() coupleLabel = 'Joelson & Marjorie';
+  @Input() weddingDate: string | Date | null = null;
+  @Input() location = 'Agadir, Maroc';
 
   readonly downloading = signal(false);
 
@@ -132,9 +135,10 @@ export class QrCodeComponent {
     ctx.font = '600 24px Georgia, serif';
     ctx.fillText(`JM · ${this.coupleLabel}`, width / 2, height - 66);
 
+    const dateLabel = formatWeddingDateLabel(this.weddingDate);
     ctx.fillStyle = '#6b6455';
     ctx.font = '400 15px Georgia, serif';
-    ctx.fillText('Agadir · 05.09.2026', width / 2, height - 36);
+    ctx.fillText(dateLabel ? `${this.location} · ${dateLabel}` : this.location, width / 2, height - 36);
 
     return canvas.toDataURL('image/png');
   }

@@ -75,6 +75,8 @@
             [dataUrl]="ticket()!.qrDataUrl"
             [tableName]="reservation()!.table.name"
             [seatNumber]="reservation()!.seatNumber"
+            [weddingDate]="info()?.date ?? null"
+            [location]="info()?.location || 'Agadir, Maroc'"
           ></app-qr-code>
         }
 

@@ -14,10 +14,10 @@ import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
 })
 export class HomeComponent implements OnInit {
   readonly info = signal<WeddingInfo | null>(null);
-  readonly fallbackDate = '2026-09-05T15:00:00+01:00';
+  readonly fallbackDate = '2026-09-12T15:00:00+01:00';
 
   readonly dateLabel = computed(
-    () => formatWeddingDateLabel(this.info()?.date) || this.info()?.dateLabel || '05 Septembre 2026'
+    () => formatWeddingDateLabel(this.info()?.date) || this.info()?.dateLabel || '12 Septembre 2026'
   );
 
   constructor(private weddingInfoService: WeddingInfoService) {}
