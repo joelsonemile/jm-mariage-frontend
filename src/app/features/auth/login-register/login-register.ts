@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { LINKS_TO_COUPLE, LinkToCouple } from '../../../core/models/user.model';
@@ -12,7 +13,7 @@ type Tab = 'login' | 'register';
 @Component({
   selector: 'app-login-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ButtonComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ButtonComponent, ThemeToggleComponent],
   templateUrl: './login-register.html',
 })
 export class LoginRegisterComponent implements OnInit {

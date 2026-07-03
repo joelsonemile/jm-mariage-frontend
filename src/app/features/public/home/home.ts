@@ -5,11 +5,12 @@ import { WeddingInfo } from '../../../core/models/wedding-info.model';
 import { WeddingInfoService } from '../../../core/services/wedding-info.service';
 import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
 import { CountdownComponent } from '../../../shared/components/countdown/countdown';
+import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, CountdownComponent],
+  imports: [CommonModule, RouterLink, CountdownComponent, ThemeToggleComponent],
   templateUrl: './home.html',
 })
 export class HomeComponent implements OnInit {

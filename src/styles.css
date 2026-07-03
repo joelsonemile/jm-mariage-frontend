@@ -23,6 +23,27 @@
   --color-error: #e53935;
 }
 
+/*
+  Mode clair : mêmes accents dorés et la même identité "voyage/mariage",
+  mais fond ivoire chaleureux et textes foncés pour un bon contraste.
+  Le sélecteur d'attribut l'emporte naturellement sur les valeurs de :root ci-dessus.
+*/
+:root[data-theme='light'] {
+  --color-bg: #faf6ec;
+  --color-bg-secondary: #f1ead5;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f6f0df;
+  --color-border: #e3d6ac;
+
+  --color-gold: #a9822f;
+  --color-gold-bright: #a67c00;
+  --color-gold-matte: #7a5f1f;
+
+  --color-text: #211a0f;
+  --color-text-soft: #2e2718;
+  --color-text-muted: #7d735c;
+}
+
 html,
 body {
   height: 100%;
@@ -31,6 +52,7 @@ body {
   color: var(--color-text-soft);
   font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 * {
