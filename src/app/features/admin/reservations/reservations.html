@@ -30,7 +30,7 @@
             @if (r.status === 'pending') {
               <button (click)="approve(r)" class="w-8 h-8 rounded-full bg-[var(--color-success)]/15 text-[var(--color-success)] flex items-center justify-center">✓</button>
             }
-            <button (click)="remove(r)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+            <button (click)="deleting.set(r)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
           </div>
         </div>
       }
@@ -41,3 +41,16 @@
     </div>
   }
 </div>
+
+<app-modal [open]="!!deleting()" heading="Supprimer cette réservation ?" (closed)="deleting.set(null)">
+  <p class="text-sm text-[var(--color-text-muted)] mb-5">
+    La réservation de <strong class="text-[var(--color-text)]">{{ deleting()?.guest?.fullName }}</strong>
+    ({{ deleting()?.table?.name }} · Place #{{ deleting()?.seatNumber }}) sera définitivement supprimée et la place sera libérée.
+  </p>
+  <div class="flex gap-3">
+    <button (click)="deleting.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">
+      Annuler
+    </button>
+    <app-button variant="danger" (clicked)="confirmRemove()">Supprimer</app-button>
+  </div>
+</app-modal>

@@ -3,16 +3,19 @@ import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AdminReservation } from '../../../core/models/reservation.model';
+import { ModalComponent } from '../../../shared/components/modal/modal';
+import { ButtonComponent } from '../../../shared/components/button/button';
 
 @Component({
   selector: 'app-admin-reservations',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ModalComponent, ButtonComponent],
   templateUrl: './reservations.html',
 })
 export class AdminReservationsComponent implements OnInit {
   readonly reservations = signal<AdminReservation[]>([]);
   readonly loading = signal(true);
+  readonly deleting = signal<AdminReservation | null>(null);
 
   constructor(private adminService: AdminService, private toast: ToastService) {}
 
@@ -35,9 +38,12 @@ export class AdminReservationsComponent implements OnInit {
     await this.load();
   }
 
-  async remove(reservation: AdminReservation): Promise<void> {
+  async confirmRemove(): Promise<void> {
+    const reservation = this.deleting();
+    if (!reservation) return;
     await this.adminService.deleteReservation(reservation._id);
     this.toast.show('Réservation supprimée.', 'success');
+    this.deleting.set(null);
     await this.load();
   }
 

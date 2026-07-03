@@ -35,7 +35,7 @@
           </div>
           <div class="flex items-center gap-2 shrink-0">
             <button (click)="openEdit(g)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
-            <button (click)="remove(g)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+            <button (click)="deleting.set(g)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
           </div>
         </div>
       }
@@ -95,4 +95,16 @@
       <app-button type="submit" [loading]="saving()">Créer</app-button>
     </div>
   </form>
+</app-modal>
+
+<app-modal [open]="!!deleting()" heading="Supprimer cet invité ?" (closed)="deleting.set(null)">
+  <p class="text-sm text-[var(--color-text-muted)] mb-5">
+    <strong class="text-[var(--color-text)]">{{ deleting()?.fullName }}</strong> et sa réservation éventuelle seront définitivement supprimés.
+  </p>
+  <div class="flex gap-3">
+    <button (click)="deleting.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">
+      Annuler
+    </button>
+    <app-button variant="danger" (clicked)="confirmRemove()">Supprimer</app-button>
+  </div>
 </app-modal>

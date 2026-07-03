@@ -23,6 +23,7 @@ export class AdminGuestsComponent implements OnInit {
   readonly editing = signal<AdminGuest | null>(null);
   readonly showCreate = signal(false);
   readonly saving = signal(false);
+  readonly deleting = signal<AdminGuest | null>(null);
 
   editForm = { fullName: '', phone: '', linkToCouple: 'Autres' as LinkToCouple };
   createForm = { fullName: '', email: '', phone: '', linkToCouple: 'Autres' as LinkToCouple };
@@ -74,9 +75,12 @@ export class AdminGuestsComponent implements OnInit {
     }
   }
 
-  async remove(guest: AdminGuest): Promise<void> {
+  async confirmRemove(): Promise<void> {
+    const guest = this.deleting();
+    if (!guest) return;
     await this.adminService.deleteGuest(guest.id);
     this.toast.show('Invité supprimé.', 'success');
+    this.deleting.set(null);
     await this.load();
   }
 }
