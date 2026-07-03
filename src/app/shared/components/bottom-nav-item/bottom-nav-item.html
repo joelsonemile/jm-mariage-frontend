@@ -1,11 +1,17 @@
 <a
   [routerLink]="link"
-  routerLinkActive="text-[var(--color-gold)]"
+  routerLinkActive
+  #rla="routerLinkActive"
   [routerLinkActiveOptions]="{ exact: exact }"
-  class="flex flex-col items-center gap-1 text-[var(--color-text-muted)] py-2 px-3 transition-colors"
+  [class]="rla.isActive
+    ? 'relative flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-colors text-[var(--color-gold-bright)] bg-[var(--color-gold)]/10'
+    : 'relative flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-colors text-[var(--color-text-muted)]'"
 >
+  @if (rla.isActive) {
+    <span class="absolute top-0.5 w-1 h-1 rounded-full bg-[var(--color-gold-bright)]"></span>
+  }
   <span class="w-5 h-5">
     <ng-content></ng-content>
   </span>
-  <span class="text-[10px] tracking-wide">{{ label }}</span>
+  <span class="text-[10px] tracking-wide" [class.font-semibold]="rla.isActive">{{ label }}</span>
 </a>
