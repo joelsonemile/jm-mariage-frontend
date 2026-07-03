@@ -1,10 +1,10 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CountdownComponent } from '../../../shared/components/countdown/countdown';
-import { WeddingInfoService } from '../../../core/services/wedding-info.service';
 import { WeddingInfo } from '../../../core/models/wedding-info.model';
+import { WeddingInfoService } from '../../../core/services/wedding-info.service';
 import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
+import { CountdownComponent } from '../../../shared/components/countdown/countdown';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +17,8 @@ export class HomeComponent implements OnInit {
   readonly fallbackDate = '2026-09-12T15:00:00+01:00';
 
   readonly dateLabel = computed(
-    () => formatWeddingDateLabel(this.info()?.date) || this.info()?.dateLabel || '12 Septembre 2026'
+    () =>
+      formatWeddingDateLabel(this.info()?.date) || this.info()?.dateLabel || '12 Septembre 2026',
   );
 
   constructor(private weddingInfoService: WeddingInfoService) {}

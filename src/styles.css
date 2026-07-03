@@ -1,9 +1,9 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --font-display: "Playfair Display", serif;
-  --font-body: "Inter", sans-serif;
-  --font-accent: "Cormorant Garamond", serif;
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-accent: 'Cormorant Garamond', serif;
 
   --color-bg: #0a0a0a;
   --color-bg-secondary: #111111;
@@ -210,4 +210,142 @@ body {
 }
 .delay-7 {
   animation-delay: 0.56s;
+}
+
+.dash-track {
+  height: 2px;
+  width: 200%;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-gold) 0px,
+    var(--color-gold) 6px,
+    transparent 6px,
+    transparent 14px
+  );
+  animation: dash-flow 1.2s linear infinite;
+}
+
+@keyframes dash-flow {
+  from {
+    transform: translateX(-14px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: var(--color-gold-bright);
+  box-shadow:
+    0 0 8px rgba(255, 215, 0, 0.6),
+    0 0 16px rgba(255, 215, 0, 0.25);
+  animation: particle-drift 7s ease-in-out infinite;
+}
+
+.particle-sm {
+  width: 2px;
+  height: 2px;
+  opacity: 0.5;
+}
+
+.particle-md {
+  width: 3px;
+  height: 3px;
+  opacity: 0.7;
+}
+
+.particle-lg {
+  width: 4px;
+  height: 4px;
+  opacity: 0.9;
+}
+
+@keyframes particle-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(12px, -18px) scale(1.15);
+    opacity: 0.4;
+  }
+  75% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-8px, 10px) scale(1);
+    opacity: 0.2;
+  }
+}
+
+.couple-frame {
+  -webkit-mask-image: radial-gradient(circle at center, black 55%, transparent 78%);
+  mask-image: radial-gradient(circle at center, black 55%, transparent 78%);
+}
+
+.orbit-a {
+  position: absolute;
+  inset: 0;
+  animation: orbit-spin 10s linear infinite;
+}
+
+.orbit-b {
+  position: absolute;
+  inset: 0;
+  animation: orbit-spin 10s linear infinite reverse;
+}
+
+.orbit-c {
+  position: absolute;
+  inset: 0;
+  animation: orbit-spin 16s linear infinite;
+}
+
+.orbit-d {
+  position: absolute;
+  inset: 0;
+  animation: orbit-spin 16s linear infinite reverse;
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ring-icon {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  color: var(--color-gold-bright);
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.7),
+    0 0 20px rgba(255, 215, 0, 0.35);
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+
+.ring-icon-sm {
+  font-size: 11px;
+}
+
+@keyframes ring-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateX(-50%) scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.15);
+  }
 }
