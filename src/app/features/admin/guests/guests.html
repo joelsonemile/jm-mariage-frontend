@@ -14,12 +14,49 @@
     name="search"
     (ngModelChange)="onSearchChange()"
     placeholder="Rechercher..."
-    class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-5 focus:border-[var(--color-gold)] outline-none"
+    class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-3 focus:border-[var(--color-gold)] outline-none"
   />
 
+  <div class="flex flex-col gap-2.5 mb-5">
+    <div class="flex gap-2 overflow-x-auto pb-0.5">
+      @for (opt of linkOptions; track opt.value) {
+        <button
+          type="button"
+          (click)="linkFilter.set(opt.value)"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="linkFilter() === opt.value
+            ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+            : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          {{ opt.label }}
+        </button>
+      }
+    </div>
+
+    <div class="flex gap-2">
+      <select
+        [(ngModel)]="reservationFilter"
+        name="reservationFilter"
+        class="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text-soft)] outline-none"
+      >
+        <option value="all">Toutes les réservations</option>
+        <option value="reserved">A réservé</option>
+        <option value="none">Sans réservation</option>
+        <option value="pending">Réservation en attente</option>
+        <option value="validated">Réservation validée</option>
+      </select>
+      @if (search() || linkFilter() !== 'all' || reservationFilter() !== 'all') {
+        <button type="button" (click)="resetFilters()" class="text-xs text-[var(--color-text-muted)] px-2 whitespace-nowrap">
+          ✕ Réinitialiser
+        </button>
+      }
+    </div>
+  </div>
+
   @if (!loading()) {
+    <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredGuests().length }} résultat(s)</p>
     <div class="flex flex-col gap-3">
-      @for (g of guests(); track g.id) {
+      @for (g of filteredGuests(); track g.id) {
         <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center justify-between gap-3">
           <div>
             <p class="text-sm font-semibold text-[var(--color-text)]">{{ g.fullName }}</p>
@@ -38,6 +75,9 @@
             <button (click)="deleting.set(g)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
           </div>
         </div>
+      }
+      @if (!filteredGuests().length) {
+        <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucun résultat pour ces filtres.</p>
       }
     </div>
   }

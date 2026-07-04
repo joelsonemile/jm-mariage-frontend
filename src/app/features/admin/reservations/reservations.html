@@ -1,5 +1,5 @@
 <div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
-  <div class="flex items-start justify-between mb-6">
+  <div class="flex items-start justify-between mb-4">
     <div>
       <h1 class="font-display text-2xl text-[var(--color-text)]">Réservations</h1>
       <p class="text-xs text-[var(--color-text-muted)]">{{ pendingCount }} en attente · {{ reservations().length }} au total</p>
@@ -9,9 +9,61 @@
     </button>
   </div>
 
+  <div class="flex flex-col gap-2.5 mb-5">
+    <input
+      [(ngModel)]="search"
+      name="search"
+      placeholder="Rechercher un invité..."
+      class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] focus:border-[var(--color-gold)] outline-none"
+    />
+
+    <div class="flex gap-2 overflow-x-auto pb-0.5">
+      @for (opt of statusOptions; track opt.value) {
+        <button
+          type="button"
+          (click)="statusFilter.set(opt.value)"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="statusFilter() === opt.value
+            ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+            : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          {{ opt.label }}
+        </button>
+      }
+    </div>
+
+    <div class="flex gap-2">
+      <select
+        [(ngModel)]="tableFilter"
+        name="tableFilter"
+        class="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text-soft)] outline-none"
+      >
+        <option value="all">Toutes les tables</option>
+        @for (t of tableOptions(); track t.id) {
+          <option [value]="t.id">{{ t.name }}</option>
+        }
+      </select>
+      <select
+        [(ngModel)]="sortBy"
+        name="sortBy"
+        class="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text-soft)] outline-none"
+      >
+        <option value="recent">Plus récent</option>
+        <option value="oldest">Plus ancien</option>
+        <option value="name">Nom (A-Z)</option>
+      </select>
+      @if (search() || statusFilter() !== 'all' || tableFilter() !== 'all' || sortBy() !== 'recent') {
+        <button type="button" (click)="resetFilters()" class="text-xs text-[var(--color-text-muted)] px-2 whitespace-nowrap">
+          ✕ Réinitialiser
+        </button>
+      }
+    </div>
+  </div>
+
   @if (!loading()) {
+    <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredReservations().length }} résultat(s)</p>
     <div class="flex flex-col gap-3">
-      @for (r of reservations(); track r._id) {
+      @for (r of filteredReservations(); track r._id) {
         <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2">
@@ -37,6 +89,8 @@
 
       @if (!reservations().length) {
         <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucune réservation pour le moment.</p>
+      } @else if (!filteredReservations().length) {
+        <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucun résultat pour ces filtres.</p>
       }
     </div>
   }
