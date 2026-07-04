@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AdminGuest, AdminReservation, ReservationStatus } from '../models/reservation.model';
+import { InvitedGuest } from '../models/invited-guest.model';
 
 export interface AdminDashboardStats {
   totalGuests: number;
@@ -67,5 +68,25 @@ export class AdminService {
 
   async exportCsv(): Promise<Blob> {
     return firstValueFrom(this.http.get(`${this.base}/export/csv`, { responseType: 'blob' }));
+  }
+
+  async listInvitedGuests(search = ''): Promise<InvitedGuest[]> {
+    const url = search
+      ? `${this.base}/invited-guests?search=${encodeURIComponent(search)}`
+      : `${this.base}/invited-guests`;
+    const res = await firstValueFrom(this.http.get<{ data: { invitedGuests: InvitedGuest[] } }>(url));
+    return res.data.invitedGuests;
+  }
+
+  async createInvitedGuest(payload: { nom: string; prenom: string; telephone: string }): Promise<void> {
+    await firstValueFrom(this.http.post(`${this.base}/invited-guests`, payload));
+  }
+
+  async updateInvitedGuest(id: string, payload: Partial<{ nom: string; prenom: string; telephone: string }>): Promise<void> {
+    await firstValueFrom(this.http.put(`${this.base}/invited-guests/${id}`, payload));
+  }
+
+  async deleteInvitedGuest(id: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${this.base}/invited-guests/${id}`));
   }
 }

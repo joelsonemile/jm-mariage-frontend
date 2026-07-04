@@ -79,6 +79,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/guests/guests').then((m) => m.AdminGuestsComponent),
       },
       {
+        path: 'invited-guests',
+        loadComponent: () =>
+          import('./features/admin/invited-guests/invited-guests').then((m) => m.AdminInvitedGuestsComponent),
+      },
+      {
         path: 'tables',
         loadComponent: () => import('./features/admin/tables/tables').then((m) => m.AdminTablesComponent),
       },
