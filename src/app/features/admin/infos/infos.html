@@ -24,6 +24,10 @@
       <input [(ngModel)]="form.location" name="location" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
     </div>
     <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">LIEN GOOGLE MAPS (ITINÉRAIRE)</label>
+      <input [(ngModel)]="form.mapUrl" name="mapUrl" placeholder="https://maps.app.goo.gl/..." class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TENUE</label>
       <input [(ngModel)]="form.dressCode" name="dressCode" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
     </div>

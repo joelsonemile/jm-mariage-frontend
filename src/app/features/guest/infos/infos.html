@@ -26,10 +26,20 @@
       </div>
       <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-[var(--color-gold)]/15 flex items-center justify-center">📍</div>
-        <div>
+        <div class="flex-1">
           <p class="text-[10px] tracking-widest text-[var(--color-text-muted)]">LIEU</p>
           <p class="text-sm text-[var(--color-text-soft)]">{{ i.location }}</p>
         </div>
+        @if (i.mapUrl) {
+          <a
+            [href]="i.mapUrl"
+            target="_blank"
+            rel="noopener"
+            class="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black"
+          >
+            🧭 Itinéraire
+          </a>
+        }
       </div>
       <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-[var(--color-gold)]/15 flex items-center justify-center">👔</div>

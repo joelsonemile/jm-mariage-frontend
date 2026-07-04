@@ -9,6 +9,7 @@ export interface WeddingInfo {
   dateLabel: string;
   ceremonyTime: string;
   location: string;
+  mapUrl: string;
   dressCode: string;
   programSummary: string;
   programDetailed: ProgramStep[];
