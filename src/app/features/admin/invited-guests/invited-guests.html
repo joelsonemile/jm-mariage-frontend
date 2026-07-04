@@ -17,15 +17,41 @@
     name="search"
     (ngModelChange)="onSearchChange()"
     placeholder="Rechercher un nom, prénom ou téléphone..."
-    class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-5 focus:border-[var(--color-gold)] outline-none"
+    class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-3 focus:border-[var(--color-gold)] outline-none"
   />
 
+  <div class="flex gap-2 overflow-x-auto pb-0.5 mb-2">
+    @for (opt of categoryOptions; track opt.value) {
+      <button
+        type="button"
+        (click)="categoryFilter.set(opt.value)"
+        class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+        [class]="categoryFilter() === opt.value
+          ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+          : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+      >
+        {{ opt.label }}{{ opt.value !== 'all' && categoryCounts().get(opt.value) ? ' (' + categoryCounts().get(opt.value) + ')' : '' }}
+      </button>
+    }
+    @if (search() || categoryFilter() !== 'all') {
+      <button type="button" (click)="resetFilters()" class="text-xs text-[var(--color-text-muted)] px-2 whitespace-nowrap shrink-0">
+        ✕ Réinitialiser
+      </button>
+    }
+  </div>
+
   @if (!loading()) {
+    <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredInvitedGuests().length }} résultat(s)</p>
     <div class="flex flex-col gap-3">
-      @for (g of invitedGuests(); track g._id) {
+      @for (g of filteredInvitedGuests(); track g._id) {
         <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center justify-between gap-3">
           <div>
-            <p class="text-sm font-semibold text-[var(--color-text)]">{{ g.nom }} {{ g.prenom }}</p>
+            <div class="flex items-center gap-2 flex-wrap">
+              <p class="text-sm font-semibold text-[var(--color-text)]">{{ g.nom }} {{ g.prenom }}</p>
+              <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)]">
+                {{ g.categorie }}
+              </span>
+            </div>
             @if (g.telephone) {
               <p class="text-xs text-[var(--color-text-muted)]">{{ g.telephone }}</p>
             }
@@ -36,7 +62,7 @@
           </div>
         </div>
       }
-      @if (!invitedGuests().length) {
+      @if (!filteredInvitedGuests().length) {
         <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucun résultat.</p>
       }
     </div>
@@ -56,6 +82,14 @@
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TÉLÉPHONE</label>
       <input [(ngModel)]="editForm.telephone" name="editTelephone" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">CATÉGORIE / SERVICE</label>
+      <select [(ngModel)]="editForm.categorie" name="editCategorie" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
+        @for (c of categories; track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
     </div>
     <div class="flex gap-3">
       <button type="button" (click)="editing.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>
@@ -77,6 +111,14 @@
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TÉLÉPHONE</label>
       <input [(ngModel)]="createForm.telephone" name="createTelephone" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">CATÉGORIE / SERVICE</label>
+      <select [(ngModel)]="createForm.categorie" name="createCategorie" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
+        @for (c of categories; track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
     </div>
     <div class="flex gap-3">
       <button type="button" (click)="showCreate.set(false)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>

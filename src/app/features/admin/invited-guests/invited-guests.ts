@@ -1,9 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { InvitedGuest } from '../../../core/models/invited-guest.model';
+import { INVITED_GUEST_CATEGORIES, InvitedGuest, InvitedGuestCategory } from '../../../core/models/invited-guest.model';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { ButtonComponent } from '../../../shared/components/button/button';
 
@@ -17,14 +17,33 @@ export class AdminInvitedGuestsComponent implements OnInit {
   readonly invitedGuests = signal<InvitedGuest[]>([]);
   readonly loading = signal(true);
   readonly search = signal('');
+  readonly categories = INVITED_GUEST_CATEGORIES;
+
+  readonly categoryFilter = signal<'all' | InvitedGuestCategory>('all');
+  readonly categoryOptions: { value: 'all' | InvitedGuestCategory; label: string }[] = [
+    { value: 'all', label: 'Toutes' },
+    ...INVITED_GUEST_CATEGORIES.map((c) => ({ value: c, label: c })),
+  ];
 
   readonly editing = signal<InvitedGuest | null>(null);
   readonly showCreate = signal(false);
   readonly saving = signal(false);
   readonly deleting = signal<InvitedGuest | null>(null);
 
-  editForm = { nom: '', prenom: '', telephone: '' };
-  createForm = { nom: '', prenom: '', telephone: '' };
+  editForm = { nom: '', prenom: '', telephone: '', categorie: 'Autres' as InvitedGuestCategory };
+  createForm = { nom: '', prenom: '', telephone: '', categorie: 'Autres' as InvitedGuestCategory };
+
+  readonly filteredInvitedGuests = computed(() => {
+    const category = this.categoryFilter();
+    if (category === 'all') return this.invitedGuests();
+    return this.invitedGuests().filter((g) => g.categorie === category);
+  });
+
+  readonly categoryCounts = computed(() => {
+    const counts = new Map<string, number>();
+    for (const g of this.invitedGuests()) counts.set(g.categorie, (counts.get(g.categorie) || 0) + 1);
+    return counts;
+  });
 
   constructor(private adminService: AdminService, private toast: ToastService) {}
 
@@ -41,9 +60,15 @@ export class AdminInvitedGuestsComponent implements OnInit {
     await this.load();
   }
 
+  resetFilters(): void {
+    this.search.set('');
+    this.categoryFilter.set('all');
+    this.load();
+  }
+
   openEdit(guest: InvitedGuest): void {
     this.editing.set(guest);
-    this.editForm = { nom: guest.nom, prenom: guest.prenom, telephone: guest.telephone };
+    this.editForm = { nom: guest.nom, prenom: guest.prenom, telephone: guest.telephone, categorie: guest.categorie };
   }
 
   async saveEdit(): Promise<void> {
@@ -66,7 +91,7 @@ export class AdminInvitedGuestsComponent implements OnInit {
       await this.adminService.createInvitedGuest(this.createForm);
       this.toast.show('Invité attendu ajouté.', 'success');
       this.showCreate.set(false);
-      this.createForm = { nom: '', prenom: '', telephone: '' };
+      this.createForm = { nom: '', prenom: '', telephone: '', categorie: 'Autres' };
       await this.load();
     } finally {
       this.saving.set(false);

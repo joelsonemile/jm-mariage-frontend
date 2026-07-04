@@ -78,11 +78,11 @@ export class AdminService {
     return res.data.invitedGuests;
   }
 
-  async createInvitedGuest(payload: { nom: string; prenom: string; telephone: string }): Promise<void> {
+  async createInvitedGuest(payload: { nom: string; prenom: string; telephone: string; categorie: string }): Promise<void> {
     await firstValueFrom(this.http.post(`${this.base}/invited-guests`, payload));
   }
 
-  async updateInvitedGuest(id: string, payload: Partial<{ nom: string; prenom: string; telephone: string }>): Promise<void> {
+  async updateInvitedGuest(id: string, payload: Partial<{ nom: string; prenom: string; telephone: string; categorie: string }>): Promise<void> {
     await firstValueFrom(this.http.put(`${this.base}/invited-guests/${id}`, payload));
   }
 
