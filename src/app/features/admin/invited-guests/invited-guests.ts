@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { INVITED_GUEST_CATEGORIES, InvitedGuest, InvitedGuestCategory } from '../../../core/models/invited-guest.model';
+import { InvitedGuest } from '../../../core/models/invited-guest.model';
+import { Category } from '../../../core/models/category.model';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { ButtonComponent } from '../../../shared/components/button/button';
 
@@ -15,23 +16,30 @@ import { ButtonComponent } from '../../../shared/components/button/button';
 })
 export class AdminInvitedGuestsComponent implements OnInit {
   readonly invitedGuests = signal<InvitedGuest[]>([]);
+  readonly categories = signal<Category[]>([]);
   readonly loading = signal(true);
   readonly search = signal('');
-  readonly categories = INVITED_GUEST_CATEGORIES;
 
-  readonly categoryFilter = signal<'all' | InvitedGuestCategory>('all');
-  readonly categoryOptions: { value: 'all' | InvitedGuestCategory; label: string }[] = [
+  readonly categoryFilter = signal<string>('all');
+  readonly categoryOptions = computed(() => [
     { value: 'all', label: 'Toutes' },
-    ...INVITED_GUEST_CATEGORIES.map((c) => ({ value: c, label: c })),
-  ];
+    ...this.categories().map((c) => ({ value: c.nom, label: c.nom })),
+  ]);
 
   readonly editing = signal<InvitedGuest | null>(null);
   readonly showCreate = signal(false);
   readonly saving = signal(false);
   readonly deleting = signal<InvitedGuest | null>(null);
 
-  editForm = { nom: '', prenom: '', telephone: '', categorie: 'Autres' as InvitedGuestCategory };
-  createForm = { nom: '', prenom: '', telephone: '', categorie: 'Autres' as InvitedGuestCategory };
+  readonly showManageCategories = signal(false);
+  readonly newCategoryName = signal('');
+  readonly editingCategory = signal<Category | null>(null);
+  readonly editingCategoryName = signal('');
+  readonly deletingCategory = signal<Category | null>(null);
+  readonly categorySaving = signal(false);
+
+  editForm = { nom: '', prenom: '', telephone: '', categorie: '' };
+  createForm = { nom: '', prenom: '', telephone: '', categorie: '' };
 
   readonly filteredInvitedGuests = computed(() => {
     const category = this.categoryFilter();
@@ -48,12 +56,19 @@ export class AdminInvitedGuestsComponent implements OnInit {
   constructor(private adminService: AdminService, private toast: ToastService) {}
 
   async ngOnInit(): Promise<void> {
-    await this.load();
+    await Promise.all([this.load(), this.loadCategories()]);
     this.loading.set(false);
   }
 
   async load(): Promise<void> {
     this.invitedGuests.set(await this.adminService.listInvitedGuests(this.search()));
+  }
+
+  async loadCategories(): Promise<void> {
+    const categories = await this.adminService.listCategories();
+    this.categories.set(categories);
+    const firstName = categories[0]?.nom || '';
+    if (!this.createForm.categorie) this.createForm.categorie = firstName;
   }
 
   async onSearchChange(): Promise<void> {
@@ -91,7 +106,7 @@ export class AdminInvitedGuestsComponent implements OnInit {
       await this.adminService.createInvitedGuest(this.createForm);
       this.toast.show('Invité attendu ajouté.', 'success');
       this.showCreate.set(false);
-      this.createForm = { nom: '', prenom: '', telephone: '', categorie: 'Autres' };
+      this.createForm = { nom: '', prenom: '', telephone: '', categorie: this.categories()[0]?.nom || '' };
       await this.load();
     } finally {
       this.saving.set(false);
@@ -105,5 +120,48 @@ export class AdminInvitedGuestsComponent implements OnInit {
     this.toast.show('Invité attendu supprimé.', 'success');
     this.deleting.set(null);
     await this.load();
+  }
+
+  async addCategory(): Promise<void> {
+    const nom = this.newCategoryName().trim();
+    if (!nom) return;
+    this.categorySaving.set(true);
+    try {
+      await this.adminService.createCategory(nom);
+      this.toast.show('Catégorie ajoutée.', 'success');
+      this.newCategoryName.set('');
+      await this.loadCategories();
+    } finally {
+      this.categorySaving.set(false);
+    }
+  }
+
+  startEditCategory(category: Category): void {
+    this.editingCategory.set(category);
+    this.editingCategoryName.set(category.nom);
+  }
+
+  async saveCategory(): Promise<void> {
+    const category = this.editingCategory();
+    const nom = this.editingCategoryName().trim();
+    if (!category || !nom) return;
+    this.categorySaving.set(true);
+    try {
+      await this.adminService.updateCategory(category._id, nom);
+      this.toast.show('Catégorie renommée. Les invités concernés ont été mis à jour.', 'success');
+      this.editingCategory.set(null);
+      await Promise.all([this.loadCategories(), this.load()]);
+    } finally {
+      this.categorySaving.set(false);
+    }
+  }
+
+  async confirmDeleteCategory(): Promise<void> {
+    const category = this.deletingCategory();
+    if (!category) return;
+    await this.adminService.deleteCategory(category._id);
+    this.toast.show('Catégorie supprimée.', 'success');
+    this.deletingCategory.set(null);
+    await this.loadCategories();
   }
 }

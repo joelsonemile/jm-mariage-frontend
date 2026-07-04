@@ -4,9 +4,14 @@
       <h1 class="font-display text-2xl text-[var(--color-text)]">Invités attendus</h1>
       <p class="text-xs text-[var(--color-text-muted)]">{{ invitedGuests().length }} personnes sur la liste</p>
     </div>
-    <button (click)="showCreate.set(true)" class="text-xs bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black rounded-full px-4 py-2 font-semibold whitespace-nowrap">
-      + Ajouter
-    </button>
+    <div class="flex items-center gap-2 shrink-0">
+      <button (click)="showManageCategories.set(true)" class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap">
+        ⚙ Catégories
+      </button>
+      <button (click)="showCreate.set(true)" class="text-xs bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black rounded-full px-4 py-2 font-semibold whitespace-nowrap">
+        + Ajouter
+      </button>
+    </div>
   </div>
   <p class="text-[11px] text-[var(--color-text-muted)] mb-4">
     Liste de référence à vérifier lors de l'approbation d'une réservation.
@@ -21,7 +26,7 @@
   />
 
   <div class="flex gap-2 overflow-x-auto pb-0.5 mb-2">
-    @for (opt of categoryOptions; track opt.value) {
+    @for (opt of categoryOptions(); track opt.value) {
       <button
         type="button"
         (click)="categoryFilter.set(opt.value)"
@@ -86,8 +91,8 @@
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">CATÉGORIE / SERVICE</label>
       <select [(ngModel)]="editForm.categorie" name="editCategorie" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
-        @for (c of categories; track c) {
-          <option [value]="c">{{ c }}</option>
+        @for (c of categories(); track c._id) {
+          <option [value]="c.nom">{{ c.nom }}</option>
         }
       </select>
     </div>
@@ -115,8 +120,8 @@
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">CATÉGORIE / SERVICE</label>
       <select [(ngModel)]="createForm.categorie" name="createCategorie" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
-        @for (c of categories; track c) {
-          <option [value]="c">{{ c }}</option>
+        @for (c of categories(); track c._id) {
+          <option [value]="c.nom">{{ c.nom }}</option>
         }
       </select>
     </div>
@@ -136,5 +141,62 @@
       Annuler
     </button>
     <app-button variant="danger" (clicked)="confirmRemove()">Supprimer</app-button>
+  </div>
+</app-modal>
+
+<app-modal [open]="showManageCategories()" heading="Gérer les catégories" (closed)="showManageCategories.set(false)">
+  <div class="flex flex-col gap-4">
+    <div class="flex gap-2">
+      <input
+        [(ngModel)]="newCategoryName"
+        name="newCategoryName"
+        placeholder="Nouvelle catégorie..."
+        class="flex-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none"
+      />
+      <button
+        type="button"
+        (click)="addCategory()"
+        [disabled]="categorySaving() || !newCategoryName().trim()"
+        class="text-xs rounded-lg px-4 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold disabled:opacity-50"
+      >
+        Ajouter
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
+      @for (c of categories(); track c._id) {
+        <div class="flex items-center gap-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-2">
+          @if (editingCategory()?._id === c._id) {
+            <input
+              [(ngModel)]="editingCategoryName"
+              name="editCategoryName-{{ c._id }}"
+              class="flex-1 bg-transparent text-sm text-[var(--color-text-soft)] outline-none border-b border-[var(--color-gold)]"
+            />
+            <button type="button" (click)="saveCategory()" [disabled]="categorySaving()" class="text-xs text-[var(--color-success)] font-semibold px-2">✓</button>
+            <button type="button" (click)="editingCategory.set(null)" class="text-xs text-[var(--color-text-muted)] px-2">✕</button>
+          } @else {
+            <span class="flex-1 text-sm text-[var(--color-text-soft)]">
+              {{ c.nom }}
+              <span class="text-[var(--color-text-muted)]">({{ categoryCounts().get(c.nom) || 0 }})</span>
+            </span>
+            <button type="button" (click)="startEditCategory(c)" class="w-7 h-7 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center text-xs">✎</button>
+            <button type="button" (click)="deletingCategory.set(c)" class="w-7 h-7 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center text-xs">🗑</button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</app-modal>
+
+<app-modal [open]="!!deletingCategory()" heading="Supprimer cette catégorie ?" (closed)="deletingCategory.set(null)">
+  <p class="text-sm text-[var(--color-text-muted)] mb-5">
+    La catégorie <strong class="text-[var(--color-text)]">{{ deletingCategory()?.nom }}</strong> sera supprimée.
+    Impossible si des invités attendus l'utilisent encore.
+  </p>
+  <div class="flex gap-3">
+    <button (click)="deletingCategory.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">
+      Annuler
+    </button>
+    <app-button variant="danger" (clicked)="confirmDeleteCategory()">Supprimer</app-button>
   </div>
 </app-modal>

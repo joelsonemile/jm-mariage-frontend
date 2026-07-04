@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AdminGuest, AdminReservation, ReservationStatus } from '../models/reservation.model';
 import { InvitedGuest } from '../models/invited-guest.model';
+import { Category } from '../models/category.model';
 
 export interface AdminDashboardStats {
   totalGuests: number;
@@ -88,5 +89,23 @@ export class AdminService {
 
   async deleteInvitedGuest(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/invited-guests/${id}`));
+  }
+
+  async listCategories(): Promise<Category[]> {
+    const res = await firstValueFrom(this.http.get<{ data: { categories: Category[] } }>(`${this.base}/categories`));
+    return res.data.categories;
+  }
+
+  async createCategory(nom: string): Promise<Category> {
+    const res = await firstValueFrom(this.http.post<{ data: { category: Category } }>(`${this.base}/categories`, { nom }));
+    return res.data.category;
+  }
+
+  async updateCategory(id: string, nom: string): Promise<void> {
+    await firstValueFrom(this.http.put(`${this.base}/categories/${id}`, { nom }));
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${this.base}/categories/${id}`));
   }
 }
