@@ -23,22 +23,12 @@
       <path d="M3 9h18M8 2v4M16 2v4" />
     </svg>
   </app-bottom-nav-item>
-  @if (mapUrl()) {
-    <a
-      [href]="mapUrl()"
-      target="_blank"
-      rel="noopener"
-      class="flex flex-col items-center gap-1 text-[var(--color-text-muted)] py-2 px-3 rounded-xl transition-colors"
-    >
-      <span class="w-5 h-5">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 21s-7-6.1-7-11a7 7 0 1114 0c0 4.9-7 11-7 11z" />
-          <path d="M9 10.5l2-1 2 1 2-1M9 10.5v3l2 1 2-1v-3" />
-        </svg>
-      </span>
-      <span class="text-[10px] tracking-wide">Itinéraire</span>
-    </a>
-  }
+  <app-bottom-nav-item link="/guest/itineraire" label="Itinéraire">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 21s-7-6.1-7-11a7 7 0 1114 0c0 4.9-7 11-7 11z" />
+      <path d="M9 10.5l2-1 2 1 2-1M9 10.5v3l2 1 2-1v-3" />
+    </svg>
+  </app-bottom-nav-item>
   <app-bottom-nav-item link="/guest/profil" label="Profil">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="8" r="4" />

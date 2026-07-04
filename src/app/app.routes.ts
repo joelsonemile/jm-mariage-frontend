@@ -49,6 +49,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/guest/infos/infos').then((m) => m.GuestInfosComponent),
       },
       {
+        path: 'itineraire',
+        loadComponent: () =>
+          import('./features/guest/itineraire/itineraire').then((m) => m.ItineraireComponent),
+      },
+      {
         path: 'profil',
         loadComponent: () => import('./features/guest/profil/profil').then((m) => m.GuestProfilComponent),
       },

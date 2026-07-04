@@ -1,0 +1,55 @@
+<div class="px-5 pt-8 pb-6 max-w-lg mx-auto">
+  <div class="text-center mb-6 animate-fade-in-up">
+    <div class="text-[var(--color-gold)] text-xs tracking-[0.3em] mb-2">✦ EMBARQUEMENT ✦</div>
+    <h1 class="font-display text-2xl text-[var(--color-text)]">Itinéraire</h1>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Retrouvez-nous le jour J</p>
+  </div>
+
+  @if (!loading() && info(); as i) {
+    <div class="relative bg-[var(--color-surface)] border border-[var(--color-gold)]/30 rounded-2xl p-6 text-center overflow-hidden animate-ticket-in">
+      <div class="pointer-events-none absolute -inset-1 rounded-2xl border border-[var(--color-gold)]/20 animate-glow-pulse"></div>
+
+      <div class="relative flex flex-col items-center">
+        <div class="relative w-24 h-24 mb-4">
+          <div class="orbit-a">
+            <span class="ring-icon">✦</span>
+          </div>
+          <div class="orbit-c">
+            <span class="ring-icon ring-icon-sm">♡</span>
+          </div>
+          <div class="absolute inset-0 flex items-center justify-center rounded-full bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/30">
+            <span class="text-4xl">📍</span>
+          </div>
+        </div>
+
+        <div class="text-xs text-[var(--color-gold)] flex items-center justify-center gap-1.5 mb-2">✦ LIEU DE LA CÉRÉMONIE</div>
+        <p class="font-display text-xl text-[var(--color-text)] mb-1">{{ i.location || 'Agadir, Maroc' }}</p>
+        @if (i.ceremonyTime) {
+          <p class="text-sm text-[var(--color-text-muted)]">{{ i.ceremonyTime }}</p>
+        }
+        @if (i.dateLabel) {
+          <p class="text-xs text-[var(--color-gold-bright)] mt-1">{{ i.dateLabel }}</p>
+        }
+
+        <div class="dash-track my-6 opacity-60"></div>
+
+        @if (i.mapUrl) {
+          <button
+            type="button"
+            (click)="openMap()"
+            class="w-full inline-flex items-center justify-center gap-2 rounded-full font-semibold text-sm px-6 py-3.5 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] transition-transform active:scale-95"
+          >
+            🧭 Ouvrir l'itinéraire dans Google Maps
+          </button>
+          <p class="text-[11px] text-[var(--color-text-muted)] mt-3">
+            L'application Google Maps s'ouvrira avec le trajet vers le lieu de la cérémonie.
+          </p>
+        } @else {
+          <p class="text-sm text-[var(--color-text-muted)]">Le lien de l'itinéraire sera bientôt disponible.</p>
+        }
+      </div>
+    </div>
+  } @else if (!loading()) {
+    <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Informations indisponibles pour le moment.</p>
+  }
+</div>
