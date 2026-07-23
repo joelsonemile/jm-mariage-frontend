@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WeddingInfoService } from '../../../core/services/wedding-info.service';
@@ -17,12 +17,20 @@ export class AdminInfosComponent implements OnInit {
   readonly saving = signal(false);
   form: Partial<WeddingInfo> = {};
 
-  constructor(private weddingInfoService: WeddingInfoService, private toast: ToastService) {}
+  constructor(
+    private weddingInfoService: WeddingInfoService,
+    private toast: ToastService,
+    private cd: ChangeDetectorRef
+  ) {}
 
   async ngOnInit(): Promise<void> {
     const info = await this.weddingInfoService.get();
     if (info) this.form = { ...info, date: info.date?.slice(0, 16) };
     if (!this.form.programDetailed) this.form.programDetailed = [];
+    // L'app tourne sans zone.js : une mutation de propriété après un `await` ne
+    // planifie pas de détection de changements toute seule, contrairement à un
+    // événement DOM ou une écriture de signal — on la déclenche donc manuellement.
+    this.cd.detectChanges();
   }
 
   get dateLabelPreview(): string {
