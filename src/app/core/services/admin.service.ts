@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { AdminGuest, AdminReservation, ReservationStatus } from '../models/reservation.model';
 import { InvitedGuest } from '../models/invited-guest.model';
 import { Category } from '../models/category.model';
+import { CommitteeMember } from '../models/committee-member.model';
 
 export interface AdminDashboardStats {
   totalGuests: number;
@@ -107,5 +108,25 @@ export class AdminService {
 
   async deleteCategory(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/categories/${id}`));
+  }
+
+  async listCommitteeMembers(commission = ''): Promise<CommitteeMember[]> {
+    const url = commission
+      ? `${this.base}/committee?commission=${encodeURIComponent(commission)}`
+      : `${this.base}/committee`;
+    const res = await firstValueFrom(this.http.get<{ data: { committeeMembers: CommitteeMember[] } }>(url));
+    return res.data.committeeMembers;
+  }
+
+  async createCommitteeMember(payload: { nom: string; role: string; commission: string }): Promise<void> {
+    await firstValueFrom(this.http.post(`${this.base}/committee`, payload));
+  }
+
+  async updateCommitteeMember(id: string, payload: Partial<{ nom: string; role: string; commission: string }>): Promise<void> {
+    await firstValueFrom(this.http.put(`${this.base}/committee/${id}`, payload));
+  }
+
+  async deleteCommitteeMember(id: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${this.base}/committee/${id}`));
   }
 }

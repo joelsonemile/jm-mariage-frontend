@@ -40,6 +40,44 @@
       <textarea [(ngModel)]="form.coupleMessage" name="coupleMessage" rows="3" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none"></textarea>
     </div>
 
+    <div class="border-t border-[var(--color-border)] pt-4">
+      <div class="flex items-center justify-between mb-2">
+        <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)]">PROGRAMME DÉTAILLÉ (visible des invités)</label>
+        <button type="button" (click)="addStep()" class="text-xs text-[var(--color-gold)] whitespace-nowrap">+ Ajouter une étape</button>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        @for (step of form.programDetailed; track trackByIndex($index); let i = $index) {
+          <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg p-3 flex flex-col gap-2">
+            <div class="flex gap-2">
+              <input
+                [(ngModel)]="step.time"
+                name="stepTime-{{ i }}"
+                placeholder="Heure (ex : 20h30)"
+                class="w-28 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-sm text-[var(--color-text-soft)] outline-none"
+              />
+              <input
+                [(ngModel)]="step.title"
+                name="stepTitle-{{ i }}"
+                placeholder="Titre de l'étape"
+                class="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-sm text-[var(--color-text-soft)] outline-none"
+              />
+              <button type="button" (click)="removeStep(i)" class="w-9 h-9 shrink-0 rounded-lg bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+            </div>
+            <input
+              [(ngModel)]="step.description"
+              name="stepDescription-{{ i }}"
+              placeholder="Détails (optionnel)"
+              class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-sm text-[var(--color-text-soft)] outline-none"
+            />
+          </div>
+        }
+        @if (!form.programDetailed?.length) {
+          <p class="text-xs text-[var(--color-text-muted)] italic">Aucune étape pour le moment.</p>
+        }
+      </div>
+    </div>
+
     <app-button type="submit" [loading]="saving()">Enregistrer</app-button>
   </form>
 </div>

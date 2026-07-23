@@ -1,5 +1,8 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://13-39-93-209.nip.io/api',
-  socketUrl: 'https://13-39-93-209.nip.io',
+  // Doit correspondre au nom du service Render défini dans render.yaml
+  // ("jm-mariage-api") — à ajuster si vous choisissez un autre nom au moment
+  // du déploiement Render.
+  apiUrl: 'https://jm-mariage-api.onrender.com/api',
+  socketUrl: 'https://jm-mariage-api.onrender.com',
 };

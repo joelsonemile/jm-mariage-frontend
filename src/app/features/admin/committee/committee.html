@@ -1,0 +1,135 @@
+<div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
+  <div class="flex items-start justify-between mb-1">
+    <div>
+      <h1 class="font-display text-2xl text-[var(--color-text)]">Comité d'organisation</h1>
+      <p class="text-xs text-[var(--color-text-muted)]">{{ members().length }} membres</p>
+    </div>
+    <button (click)="showCreate.set(true)" class="text-xs bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black rounded-full px-4 py-2 font-semibold whitespace-nowrap">
+      + Ajouter
+    </button>
+  </div>
+  <p class="text-[11px] text-[var(--color-text-muted)] mb-4">
+    Rôles principaux et membres des commissions — réservé à l'équipe d'organisation.
+  </p>
+
+  <input
+    [(ngModel)]="search"
+    name="search"
+    placeholder="Rechercher un nom ou un rôle..."
+    class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-3 focus:border-[var(--color-gold)] outline-none"
+  />
+
+  <div class="flex gap-2 overflow-x-auto pb-0.5 mb-2">
+    @for (opt of commissionOptions(); track opt.value) {
+      <button
+        type="button"
+        (click)="commissionFilter.set(opt.value)"
+        class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+        [class]="commissionFilter() === opt.value
+          ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+          : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+      >
+        {{ opt.label }}
+      </button>
+    }
+    @if (search() || commissionFilter() !== 'all') {
+      <button type="button" (click)="resetFilters()" class="text-xs text-[var(--color-text-muted)] px-2 whitespace-nowrap shrink-0">
+        ✕ Réinitialiser
+      </button>
+    }
+  </div>
+
+  @if (!loading()) {
+    <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredMembers().length }} résultat(s)</p>
+    <div class="flex flex-col gap-3">
+      @for (m of filteredMembers(); track m._id) {
+        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <p class="text-sm font-semibold text-[var(--color-text)]">{{ m.nom }}</p>
+              @if (m.commission) {
+                <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)]">
+                  {{ m.commission }}
+                </span>
+              }
+            </div>
+            @if (m.role) {
+              <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p>
+            }
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
+            <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+          </div>
+        </div>
+      }
+      @if (!filteredMembers().length) {
+        <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucun résultat.</p>
+      }
+    </div>
+  }
+</div>
+
+<app-modal [open]="!!editing()" heading="Modifier le membre" (closed)="editing.set(null)">
+  <form (ngSubmit)="saveEdit()" class="flex flex-col gap-4">
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOM</label>
+      <input [(ngModel)]="editForm.nom" name="editNom" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">RÔLE / FONCTION</label>
+      <input [(ngModel)]="editForm.role" name="editRole" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">COMMISSION</label>
+      <select [(ngModel)]="editForm.commission" name="editCommission" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
+        <option value="">Rôle principal (aucune commission)</option>
+        @for (c of commissions; track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
+    </div>
+    <div class="flex gap-3">
+      <button type="button" (click)="editing.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>
+      <app-button type="submit" [loading]="saving()">Enregistrer</app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal [open]="showCreate()" heading="Ajouter un membre" (closed)="showCreate.set(false)">
+  <form (ngSubmit)="createMember()" class="flex flex-col gap-4">
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOM</label>
+      <input required [(ngModel)]="createForm.nom" name="createNom" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">RÔLE / FONCTION</label>
+      <input [(ngModel)]="createForm.role" name="createRole" placeholder="Ex : Coordinateur Principal" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">COMMISSION</label>
+      <select [(ngModel)]="createForm.commission" name="createCommission" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
+        <option value="">Rôle principal (aucune commission)</option>
+        @for (c of commissions; track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
+    </div>
+    <div class="flex gap-3">
+      <button type="button" (click)="showCreate.set(false)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>
+      <app-button type="submit" [loading]="saving()">Ajouter</app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal [open]="!!deleting()" heading="Retirer ce membre ?" (closed)="deleting.set(null)">
+  <p class="text-sm text-[var(--color-text-muted)] mb-5">
+    <strong class="text-[var(--color-text)]">{{ deleting()?.nom }}</strong> sera définitivement retiré du comité d'organisation.
+  </p>
+  <div class="flex gap-3">
+    <button (click)="deleting.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">
+      Annuler
+    </button>
+    <app-button variant="danger" (clicked)="confirmRemove()">Supprimer</app-button>
+  </div>
+</app-modal>
