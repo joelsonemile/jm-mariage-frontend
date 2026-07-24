@@ -26,6 +26,13 @@ export class AdminInvitedGuestsComponent implements OnInit {
     ...this.categories().map((c) => ({ value: c.nom, label: c.nom })),
   ]);
 
+  readonly phoneFilter = signal<'all' | 'with' | 'without'>('all');
+  readonly phoneOptions: { value: 'all' | 'with' | 'without'; label: string }[] = [
+    { value: 'all', label: 'Tous' },
+    { value: 'with', label: 'Avec numéro' },
+    { value: 'without', label: 'Sans numéro' },
+  ];
+
   readonly editing = signal<InvitedGuest | null>(null);
   readonly showCreate = signal(false);
   readonly saving = signal(false);
@@ -43,8 +50,14 @@ export class AdminInvitedGuestsComponent implements OnInit {
 
   readonly filteredInvitedGuests = computed(() => {
     const category = this.categoryFilter();
-    if (category === 'all') return this.invitedGuests();
-    return this.invitedGuests().filter((g) => g.categorie === category);
+    const phone = this.phoneFilter();
+
+    return this.invitedGuests().filter((g) => {
+      if (category !== 'all' && g.categorie !== category) return false;
+      if (phone === 'with' && !g.telephone.trim()) return false;
+      if (phone === 'without' && g.telephone.trim()) return false;
+      return true;
+    });
   });
 
   readonly categoryCounts = computed(() => {
@@ -78,6 +91,7 @@ export class AdminInvitedGuestsComponent implements OnInit {
   resetFilters(): void {
     this.search.set('');
     this.categoryFilter.set('all');
+    this.phoneFilter.set('all');
     this.load();
   }
 
