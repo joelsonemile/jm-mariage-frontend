@@ -6,6 +6,7 @@ import { AdminGuest, AdminReservation, ReservationStatus } from '../models/reser
 import { InvitedGuest } from '../models/invited-guest.model';
 import { Category } from '../models/category.model';
 import { CommitteeMember } from '../models/committee-member.model';
+import { Commission } from '../models/commission.model';
 
 export interface AdminDashboardStats {
   totalGuests: number;
@@ -128,5 +129,23 @@ export class AdminService {
 
   async deleteCommitteeMember(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/committee/${id}`));
+  }
+
+  async listCommissions(): Promise<Commission[]> {
+    const res = await firstValueFrom(this.http.get<{ data: { commissions: Commission[] } }>(`${this.base}/commissions`));
+    return res.data.commissions;
+  }
+
+  async createCommission(nom: string): Promise<Commission> {
+    const res = await firstValueFrom(this.http.post<{ data: { commission: Commission } }>(`${this.base}/commissions`, { nom }));
+    return res.data.commission;
+  }
+
+  async updateCommission(id: string, nom: string): Promise<void> {
+    await firstValueFrom(this.http.put(`${this.base}/commissions/${id}`, { nom }));
+  }
+
+  async deleteCommission(id: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${this.base}/commissions/${id}`));
   }
 }
