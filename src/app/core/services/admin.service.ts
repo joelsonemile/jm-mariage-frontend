@@ -119,11 +119,14 @@ export class AdminService {
     return res.data.committeeMembers;
   }
 
-  async createCommitteeMember(payload: { nom: string; role: string; commission: string }): Promise<void> {
+  async createCommitteeMember(payload: { nom: string; role: string; description: string; commission: string }): Promise<void> {
     await firstValueFrom(this.http.post(`${this.base}/committee`, payload));
   }
 
-  async updateCommitteeMember(id: string, payload: Partial<{ nom: string; role: string; commission: string }>): Promise<void> {
+  async updateCommitteeMember(
+    id: string,
+    payload: Partial<{ nom: string; role: string; description: string; commission: string }>
+  ): Promise<void> {
     await firstValueFrom(this.http.put(`${this.base}/committee/${id}`, payload));
   }
 

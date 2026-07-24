@@ -41,8 +41,8 @@ export class AdminCommitteeComponent implements OnInit {
   readonly deletingCommission = signal<Commission | null>(null);
   readonly commissionSaving = signal(false);
 
-  editForm = { nom: '', role: '', commission: '' };
-  createForm = { nom: '', role: '', commission: '' };
+  editForm = { nom: '', role: '', description: '', commission: '' };
+  createForm = { nom: '', role: '', description: '', commission: '' };
 
   readonly memberCountByCommission = computed(() => {
     const counts = new Map<string, number>();
@@ -86,7 +86,7 @@ export class AdminCommitteeComponent implements OnInit {
 
   openEdit(member: CommitteeMember): void {
     this.editing.set(member);
-    this.editForm = { nom: member.nom, role: member.role, commission: member.commission };
+    this.editForm = { nom: member.nom, role: member.role, description: member.description, commission: member.commission };
   }
 
   async saveEdit(): Promise<void> {
@@ -110,7 +110,7 @@ export class AdminCommitteeComponent implements OnInit {
       await this.adminService.createCommitteeMember(this.createForm);
       this.toast.show('Membre ajouté au comité.', 'success');
       this.showCreate.set(false);
-      this.createForm = { nom: '', role: '', commission: '' };
+      this.createForm = { nom: '', role: '', description: '', commission: '' };
       await this.load();
     } finally {
       this.saving.set(false);

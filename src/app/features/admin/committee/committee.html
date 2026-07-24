@@ -48,7 +48,7 @@
     <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredMembers().length }} résultat(s)</p>
     <div class="flex flex-col gap-3">
       @for (m of filteredMembers(); track m._id) {
-        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center justify-between gap-3">
+        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-start justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 flex-wrap">
               <p class="text-sm font-semibold text-[var(--color-text)]">{{ m.nom }}</p>
@@ -60,6 +60,9 @@
             </div>
             @if (m.role) {
               <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p>
+            }
+            @if (m.description) {
+              <p class="text-xs text-[var(--color-text-soft)]/80 mt-1.5 leading-relaxed">{{ m.description }}</p>
             }
           </div>
           <div class="flex items-center gap-2 shrink-0">
@@ -86,6 +89,16 @@
       <input [(ngModel)]="editForm.role" name="editRole" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
     </div>
     <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">DESCRIPTION DE LA RESPONSABILITÉ</label>
+      <textarea
+        [(ngModel)]="editForm.description"
+        name="editDescription"
+        rows="4"
+        placeholder="Détaillez les tâches et responsabilités de ce rôle..."
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none resize-y"
+      ></textarea>
+    </div>
+    <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">COMMISSION</label>
       <select [(ngModel)]="editForm.commission" name="editCommission" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none">
         <option value="">Rôle principal (aucune commission)</option>
@@ -110,6 +123,16 @@
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">RÔLE / FONCTION</label>
       <input [(ngModel)]="createForm.role" name="createRole" placeholder="Ex : Coordinateur Principal" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">DESCRIPTION DE LA RESPONSABILITÉ</label>
+      <textarea
+        [(ngModel)]="createForm.description"
+        name="createDescription"
+        rows="4"
+        placeholder="Détaillez les tâches et responsabilités de ce rôle..."
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none resize-y"
+      ></textarea>
     </div>
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">COMMISSION</label>
