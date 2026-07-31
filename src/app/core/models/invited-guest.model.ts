@@ -4,4 +4,5 @@ export interface InvitedGuest {
   prenom: string;
   telephone: string;
   categorie: string;
+  nombreAccompagnants: number;
 }

@@ -19,4 +19,5 @@ export interface User {
   linkToCouple: LinkToCouple;
   profilePhoto: string | null;
   rsvpStatus: RsvpStatus;
+  groupSize: number;
 }

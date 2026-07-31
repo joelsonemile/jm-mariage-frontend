@@ -25,4 +25,11 @@ export class GuestService {
     );
     return res.data.user;
   }
+
+  async updateGroupSize(groupSize: number) {
+    const res = await firstValueFrom(
+      this.http.put<{ data: { user: User } }>(`${environment.apiUrl}/guests/me/group-size`, { groupSize })
+    );
+    return res.data.user;
+  }
 }

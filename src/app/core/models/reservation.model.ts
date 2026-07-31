@@ -5,6 +5,7 @@ export interface MyReservation {
   status: ReservationStatus;
   seatNumber: number;
   table: { id: string; name: string; description: string };
+  tableMates: string[];
 }
 
 export interface AdminReservation {
@@ -23,5 +24,6 @@ export interface AdminGuest {
   phone: string;
   linkToCouple: string;
   rsvpStatus: string;
-  reservation: { id: string; tableName: string; seatNumber: number; status: ReservationStatus } | null;
+  groupSize: number;
+  reservations: { id: string; tableName: string; seatNumber: number; status: ReservationStatus }[];
 }

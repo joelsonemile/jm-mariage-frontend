@@ -60,12 +60,14 @@
         <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-center justify-between gap-3">
           <div>
             <p class="text-sm font-semibold text-[var(--color-text)]">{{ g.fullName }}</p>
-            <p class="text-xs text-[var(--color-text-muted)]">{{ g.linkToCouple }} · {{ g.phone }}</p>
-            @if (g.reservation) {
-              <p class="text-xs text-[var(--color-gold)]">
-                Table {{ g.reservation.tableName }} · Place #{{ g.reservation.seatNumber }}
-                <span class="text-[var(--color-text-muted)]">({{ g.reservation.status === 'validated' ? 'Validée' : 'En attente' }})</span>
-              </p>
+            <p class="text-xs text-[var(--color-text-muted)]">{{ g.linkToCouple }} · {{ g.phone }} · {{ g.groupSize }} invité(s) déclaré(s)</p>
+            @if (g.reservations.length) {
+              @for (r of g.reservations; track r.id) {
+                <p class="text-xs text-[var(--color-gold)]">
+                  Table {{ r.tableName }} · Place #{{ r.seatNumber }}
+                  <span class="text-[var(--color-text-muted)]">({{ r.status === 'validated' ? 'Validée' : 'En attente' }})</span>
+                </p>
+              }
             } @else {
               <p class="text-xs text-[var(--color-text-muted)] italic">Aucune réservation</p>
             }

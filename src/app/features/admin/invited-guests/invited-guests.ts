@@ -45,8 +45,12 @@ export class AdminInvitedGuestsComponent implements OnInit {
   readonly deletingCategory = signal<Category | null>(null);
   readonly categorySaving = signal(false);
 
-  editForm = { nom: '', prenom: '', telephone: '', categorie: '' };
-  createForm = { nom: '', prenom: '', telephone: '', categorie: '' };
+  editForm = { nom: '', prenom: '', telephone: '', categorie: '', nombreAccompagnants: 0 };
+  createForm = { nom: '', prenom: '', telephone: '', categorie: '', nombreAccompagnants: 0 };
+
+  readonly totalHeadcount = computed(() =>
+    this.invitedGuests().reduce((sum, g) => sum + 1 + (g.nombreAccompagnants || 0), 0)
+  );
 
   readonly filteredInvitedGuests = computed(() => {
     const category = this.categoryFilter();
@@ -97,7 +101,13 @@ export class AdminInvitedGuestsComponent implements OnInit {
 
   openEdit(guest: InvitedGuest): void {
     this.editing.set(guest);
-    this.editForm = { nom: guest.nom, prenom: guest.prenom, telephone: guest.telephone, categorie: guest.categorie };
+    this.editForm = {
+      nom: guest.nom,
+      prenom: guest.prenom,
+      telephone: guest.telephone,
+      categorie: guest.categorie,
+      nombreAccompagnants: guest.nombreAccompagnants,
+    };
   }
 
   async saveEdit(): Promise<void> {
@@ -120,7 +130,7 @@ export class AdminInvitedGuestsComponent implements OnInit {
       await this.adminService.createInvitedGuest(this.createForm);
       this.toast.show('Invité attendu ajouté.', 'success');
       this.showCreate.set(false);
-      this.createForm = { nom: '', prenom: '', telephone: '', categorie: this.categories()[0]?.nom || '' };
+      this.createForm = { nom: '', prenom: '', telephone: '', categorie: this.categories()[0]?.nom || '', nombreAccompagnants: 0 };
       await this.load();
     } finally {
       this.saving.set(false);

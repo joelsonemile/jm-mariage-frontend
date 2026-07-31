@@ -4,8 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { MyReservation } from '../models/reservation.model';
 
-interface MyReservationResponse {
-  data: { reservation: MyReservation | null; tableMates?: string[] };
+interface MyReservationsResponse {
+  data: { reservations: MyReservation[]; groupSize: number };
 }
 
 interface TicketResponse {
@@ -26,30 +26,30 @@ export class ReservationService {
     return res.data.reservation;
   }
 
-  async getMine(): Promise<MyReservationResponse['data']> {
+  async getMine(): Promise<MyReservationsResponse['data']> {
     const res = await firstValueFrom(
-      this.http.get<MyReservationResponse>(`${environment.apiUrl}/reservations/me`)
+      this.http.get<MyReservationsResponse>(`${environment.apiUrl}/reservations/me`)
     );
     return res.data;
   }
 
-  async cancel(): Promise<void> {
-    await firstValueFrom(this.http.delete(`${environment.apiUrl}/reservations/me`));
+  async cancel(reservationId: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${environment.apiUrl}/reservations/${reservationId}`));
   }
 
-  async change(tableId: string, seatNumber: number) {
+  async change(reservationId: string, tableId: string, seatNumber: number) {
     const res = await firstValueFrom(
-      this.http.put<{ data: { reservation: MyReservation } }>(`${environment.apiUrl}/reservations/me/change`, {
-        tableId,
-        seatNumber,
-      })
+      this.http.put<{ data: { reservation: MyReservation } }>(
+        `${environment.apiUrl}/reservations/${reservationId}/change`,
+        { tableId, seatNumber }
+      )
     );
     return res.data.reservation;
   }
 
-  async ticket(): Promise<TicketResponse['data']> {
+  async ticket(reservationId: string): Promise<TicketResponse['data']> {
     const res = await firstValueFrom(
-      this.http.get<TicketResponse>(`${environment.apiUrl}/reservations/me/ticket`)
+      this.http.get<TicketResponse>(`${environment.apiUrl}/reservations/${reservationId}/ticket`)
     );
     return res.data;
   }

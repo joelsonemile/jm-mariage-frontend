@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ReservationService } from '../../../core/services/reservation.service';
@@ -13,21 +14,32 @@ import { ButtonComponent } from '../../../shared/components/button/button';
 import { QrCodeComponent } from '../../../shared/components/qr-code/qr-code';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 
+interface Ticket {
+  qrDataUrl: string;
+  tableName: string;
+  seatNumber: number;
+}
+
 @Component({
   selector: 'app-guest-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonComponent, QrCodeComponent, ModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ButtonComponent, QrCodeComponent, ModalComponent],
   templateUrl: './dashboard.html',
 })
 export class GuestDashboardComponent implements OnInit {
   readonly auth = inject(AuthService);
 
-  readonly reservation = signal<MyReservation | null>(null);
-  readonly tableMates = signal<string[]>([]);
+  readonly reservations = signal<MyReservation[]>([]);
   readonly info = signal<WeddingInfo | null>(null);
-  readonly ticket = signal<{ qrDataUrl: string; tableName: string; seatNumber: number } | null>(null);
-  readonly showCancelConfirm = signal(false);
+  readonly tickets = signal<Record<string, Ticket>>({});
+  readonly cancelling = signal<MyReservation | null>(null);
   readonly loading = signal(true);
+
+  readonly showGroupSizeEditor = signal(false);
+  readonly groupSizeInput = signal(1);
+  readonly savingGroupSize = signal(false);
+
+  readonly canReserveMore = computed(() => this.reservations().length < (this.auth.user()?.groupSize || 1));
 
   constructor(
     private reservationService: ReservationService,
@@ -38,22 +50,27 @@ export class GuestDashboardComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.refresh();
+    this.groupSizeInput.set(this.auth.user()?.groupSize || 1);
     this.loading.set(false);
   }
 
   async refresh(): Promise<void> {
-    const [{ reservation, tableMates }, info] = await Promise.all([
+    const [{ reservations, groupSize }, info] = await Promise.all([
       this.reservationService.getMine(),
       this.weddingInfoService.get(),
     ]);
-    this.reservation.set(reservation);
-    this.tableMates.set(tableMates || []);
+    this.reservations.set(reservations);
     this.info.set(info);
 
-    if (reservation?.status === 'validated') {
-      this.ticket.set(await this.reservationService.ticket());
-    } else {
-      this.ticket.set(null);
+    const validated = reservations.filter((r) => r.status === 'validated');
+    const entries = await Promise.all(
+      validated.map(async (r) => [r.id, await this.reservationService.ticket(r.id)] as const)
+    );
+    this.tickets.set(Object.fromEntries(entries));
+
+    const user = this.auth.user();
+    if (user && user.groupSize !== groupSize) {
+      this.auth.updateStoredUser({ ...user, groupSize });
     }
   }
 
@@ -63,9 +80,23 @@ export class GuestDashboardComponent implements OnInit {
     this.toast.show('Merci pour votre réponse !', 'success');
   }
 
+  async saveGroupSize(): Promise<void> {
+    this.savingGroupSize.set(true);
+    try {
+      const user = await this.guestService.updateGroupSize(this.groupSizeInput());
+      this.auth.updateStoredUser(user);
+      this.showGroupSizeEditor.set(false);
+      this.toast.show('Nombre d\'invités mis à jour.', 'success');
+    } finally {
+      this.savingGroupSize.set(false);
+    }
+  }
+
   async confirmCancel(): Promise<void> {
-    await this.reservationService.cancel();
-    this.showCancelConfirm.set(false);
+    const reservation = this.cancelling();
+    if (!reservation) return;
+    await this.reservationService.cancel(reservation.id);
+    this.cancelling.set(null);
     this.toast.show('Réservation annulée.', 'success');
     await this.refresh();
   }

@@ -48,10 +48,10 @@ export class AdminGuestsComponent implements OnInit {
 
     return this.guests().filter((g) => {
       if (link !== 'all' && g.linkToCouple !== link) return false;
-      if (resa === 'reserved' && !g.reservation) return false;
-      if (resa === 'none' && g.reservation) return false;
-      if (resa === 'pending' && g.reservation?.status !== 'pending') return false;
-      if (resa === 'validated' && g.reservation?.status !== 'validated') return false;
+      if (resa === 'reserved' && !g.reservations.length) return false;
+      if (resa === 'none' && g.reservations.length) return false;
+      if (resa === 'pending' && !g.reservations.some((r) => r.status === 'pending')) return false;
+      if (resa === 'validated' && !g.reservations.some((r) => r.status === 'validated')) return false;
       return true;
     });
   });

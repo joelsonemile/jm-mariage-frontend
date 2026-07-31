@@ -2,7 +2,9 @@
   <div class="flex items-start justify-between mb-1">
     <div>
       <h1 class="font-display text-2xl text-[var(--color-text)]">Invités attendus</h1>
-      <p class="text-xs text-[var(--color-text-muted)]">{{ invitedGuests().length }} personnes sur la liste</p>
+      <p class="text-xs text-[var(--color-text-muted)]">
+        {{ invitedGuests().length }} inscrits sur la liste · {{ totalHeadcount() }} personnes au total (accompagnants inclus)
+      </p>
     </div>
     <div class="flex items-center gap-2 shrink-0">
       <button (click)="showManageCategories.set(true)" class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap">
@@ -71,6 +73,11 @@
               <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)]">
                 {{ g.categorie }}
               </span>
+              @if (g.nombreAccompagnants > 0) {
+                <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-success)]/20 text-[var(--color-success)]">
+                  +{{ g.nombreAccompagnants }} accompagnant(s)
+                </span>
+              }
             </div>
             @if (g.telephone) {
               <p class="text-xs text-[var(--color-text-muted)]">{{ g.telephone }}</p>
@@ -111,6 +118,17 @@
         }
       </select>
     </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOMBRE D'ACCOMPAGNANTS</label>
+      <input
+        type="number"
+        min="0"
+        [(ngModel)]="editForm.nombreAccompagnants"
+        name="editNombreAccompagnants"
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none"
+      />
+      <p class="text-[11px] text-[var(--color-text-muted)] mt-1">Personnes qui accompagnent cet invité (hors lui-même) — comptées dans le total.</p>
+    </div>
     <div class="flex gap-3">
       <button type="button" (click)="editing.set(null)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>
       <app-button type="submit" [loading]="saving()">Enregistrer</app-button>
@@ -139,6 +157,17 @@
           <option [value]="c.nom">{{ c.nom }}</option>
         }
       </select>
+    </div>
+    <div>
+      <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">NOMBRE D'ACCOMPAGNANTS</label>
+      <input
+        type="number"
+        min="0"
+        [(ngModel)]="createForm.nombreAccompagnants"
+        name="createNombreAccompagnants"
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none"
+      />
+      <p class="text-[11px] text-[var(--color-text-muted)] mt-1">Personnes qui accompagnent cet invité (hors lui-même) — comptées dans le total.</p>
     </div>
     <div class="flex gap-3">
       <button type="button" (click)="showCreate.set(false)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">Annuler</button>
