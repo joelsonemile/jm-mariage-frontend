@@ -28,10 +28,21 @@
 </div>
 
 <app-modal [open]="showConfirm()" heading="Confirmer ?" (closed)="showConfirm.set(false)">
-  <p class="text-sm text-[var(--color-text-muted)] mb-5">
+  <p class="text-sm text-[var(--color-text-muted)] mb-4">
     Réserver la <strong class="text-[var(--color-text-soft)]">place #{{ selectedSeat() }}</strong> à la
     <strong class="text-[var(--color-text-soft)]">Table {{ detail()?.table?.name }}</strong> ?
   </p>
+  <div class="mb-5">
+    <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">
+      POUR QUI EST CETTE PLACE ? (OPTIONNEL)
+    </label>
+    <input
+      [(ngModel)]="companionName"
+      name="companionName"
+      placeholder="Ex : Marie Dupont — laissez vide si c'est pour vous"
+      class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none focus:border-[var(--color-gold)]"
+    />
+  </div>
   <div class="flex gap-3">
     <button (click)="showConfirm.set(false)" class="flex-1 text-sm rounded-full py-2.5 bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)]">
       Annuler
@@ -45,7 +56,9 @@
     <div class="text-3xl mb-2">⏱</div>
     <h3 class="font-display text-lg text-[var(--color-gold)] mb-2">Réservation enregistrée</h3>
     <p class="text-sm text-[var(--color-text-soft)] mb-1">
-      Votre place #{{ selectedSeat() }} à la Table {{ detail()?.table?.name }} a bien été enregistrée.
+      La place #{{ selectedSeat() }} à la Table {{ detail()?.table?.name }}
+      @if (companionName) { pour <strong>{{ companionName }}</strong> }
+      a bien été enregistrée.
     </p>
     <p class="text-xs text-[var(--color-text-muted)] mb-5">
       Veuillez attendre la validation de votre réservation par l'administrateur. Vous pourrez télécharger votre ticket dès qu'elle sera approuvée.

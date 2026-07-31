@@ -65,6 +65,7 @@
               @for (r of g.reservations; track r.id) {
                 <p class="text-xs text-[var(--color-gold)]">
                   Table {{ r.tableName }} · Place #{{ r.seatNumber }}
+                  @if (r.companionName) { <span class="text-[var(--color-text-muted)]">pour {{ r.companionName }}</span> }
                   <span class="text-[var(--color-text-muted)]">({{ r.status === 'validated' ? 'Validée' : 'En attente' }})</span>
                 </p>
               }

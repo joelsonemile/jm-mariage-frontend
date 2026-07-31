@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TableService } from '../../../core/services/table.service';
 import { ReservationService } from '../../../core/services/reservation.service';
@@ -13,7 +14,7 @@ import { ButtonComponent } from '../../../shared/components/button/button';
 @Component({
   selector: 'app-table-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, SeatCircleComponent, ModalComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SeatCircleComponent, ModalComponent, ButtonComponent],
   templateUrl: './table-detail.html',
 })
 export class TableDetailComponent implements OnInit, OnDestroy {
@@ -23,6 +24,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   readonly showConfirm = signal(false);
   readonly showPendingInfo = signal(false);
   readonly submitting = signal(false);
+  companionName = '';
   private unsubscribe: (() => void) | null = null;
 
   constructor(
@@ -52,6 +54,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
   pickSeat(seatNumber: number): void {
     this.selectedSeat.set(seatNumber);
+    this.companionName = '';
     this.showConfirm.set(true);
   }
 
@@ -59,7 +62,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     if (!this.selectedSeat()) return;
     this.submitting.set(true);
     try {
-      await this.reservationService.create(this.tableId, this.selectedSeat()!);
+      await this.reservationService.create(this.tableId, this.selectedSeat()!, this.companionName);
       this.showConfirm.set(false);
       this.showPendingInfo.set(true);
     } catch {

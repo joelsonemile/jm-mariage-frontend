@@ -5,6 +5,7 @@ export interface MyReservation {
   status: ReservationStatus;
   seatNumber: number;
   table: { id: string; name: string; description: string };
+  companionName: string;
   tableMates: string[];
 }
 
@@ -13,6 +14,7 @@ export interface AdminReservation {
   seatNumber: number;
   status: ReservationStatus;
   createdAt: string;
+  companionName: string;
   guest: { _id: string; fullName: string; phone: string; email: string; linkToCouple: string };
   table: { _id: string; name: string };
 }
@@ -25,5 +27,5 @@ export interface AdminGuest {
   linkToCouple: string;
   rsvpStatus: string;
   groupSize: number;
-  reservations: { id: string; tableName: string; seatNumber: number; status: ReservationStatus }[];
+  reservations: { id: string; tableName: string; seatNumber: number; status: ReservationStatus; companionName: string }[];
 }

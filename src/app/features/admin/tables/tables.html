@@ -47,7 +47,10 @@
             <div class="flex flex-col gap-1.5">
               @for (g of t.guests; track g._id) {
                 <div class="flex items-center justify-between text-xs">
-                  <span class="text-[var(--color-text-soft)]">#{{ g.seatNumber }} {{ g.guest.fullName }}</span>
+                  <span class="text-[var(--color-text-soft)]">
+                    #{{ g.seatNumber }} {{ g.companionName || g.guest.fullName }}
+                    @if (g.companionName) { <span class="text-[var(--color-text-muted)]">(cpt. {{ g.guest.fullName }})</span> }
+                  </span>
                   <span
                     class="rounded-full px-2 py-0.5"
                     [class]="g.status === 'validated' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' : 'bg-[var(--color-gold)]/20 text-[var(--color-gold)]'"

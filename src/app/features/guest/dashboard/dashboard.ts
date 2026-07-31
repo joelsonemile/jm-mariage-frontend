@@ -39,6 +39,10 @@ export class GuestDashboardComponent implements OnInit {
   readonly groupSizeInput = signal(1);
   readonly savingGroupSize = signal(false);
 
+  readonly editingCompanionId = signal<string | null>(null);
+  companionNameInput = '';
+  readonly savingCompanion = signal(false);
+
   readonly canReserveMore = computed(() => this.reservations().length < (this.auth.user()?.groupSize || 1));
 
   constructor(
@@ -89,6 +93,22 @@ export class GuestDashboardComponent implements OnInit {
       this.toast.show('Nombre d\'invités mis à jour.', 'success');
     } finally {
       this.savingGroupSize.set(false);
+    }
+  }
+
+  startEditCompanion(reservation: MyReservation): void {
+    this.editingCompanionId.set(reservation.id);
+    this.companionNameInput = reservation.companionName;
+  }
+
+  async saveCompanionName(reservation: MyReservation): Promise<void> {
+    this.savingCompanion.set(true);
+    try {
+      await this.reservationService.updateCompanionName(reservation.id, this.companionNameInput);
+      this.editingCompanionId.set(null);
+      await this.refresh();
+    } finally {
+      this.savingCompanion.set(false);
     }
   }
 

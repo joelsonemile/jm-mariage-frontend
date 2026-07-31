@@ -16,11 +16,12 @@ interface TicketResponse {
 export class ReservationService {
   constructor(private http: HttpClient) {}
 
-  async create(tableId: string, seatNumber: number) {
+  async create(tableId: string, seatNumber: number, companionName?: string) {
     const res = await firstValueFrom(
       this.http.post<{ data: { reservation: MyReservation } }>(`${environment.apiUrl}/reservations`, {
         tableId,
         seatNumber,
+        companionName: companionName || '',
       })
     );
     return res.data.reservation;
@@ -52,5 +53,15 @@ export class ReservationService {
       this.http.get<TicketResponse>(`${environment.apiUrl}/reservations/${reservationId}/ticket`)
     );
     return res.data;
+  }
+
+  async updateCompanionName(reservationId: string, companionName: string) {
+    const res = await firstValueFrom(
+      this.http.put<{ data: { reservation: MyReservation } }>(
+        `${environment.apiUrl}/reservations/${reservationId}/companion-name`,
+        { companionName }
+      )
+    );
+    return res.data.reservation;
   }
 }

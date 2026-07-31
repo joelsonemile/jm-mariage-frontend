@@ -70,6 +70,24 @@
             <div class="text-xs text-[var(--color-gold)] flex items-center gap-1.5 mb-2">⏱ EN ATTENTE DE VALIDATION</div>
             <p class="font-display text-lg text-[var(--color-text)]">{{ reservation.table.name }}</p>
             <p class="font-display text-xl text-[var(--color-gold-bright)]">Place #{{ reservation.seatNumber }}</p>
+
+            @if (editingCompanionId() === reservation.id) {
+              <div class="flex gap-2 mt-2">
+                <input
+                  [(ngModel)]="companionNameInput"
+                  name="companionName-{{ reservation.id }}"
+                  placeholder="Nom de la personne (optionnel)"
+                  class="flex-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
+                />
+                <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion()" class="text-xs text-[var(--color-success)] font-semibold px-2">✓</button>
+                <button (click)="editingCompanionId.set(null)" class="text-xs text-[var(--color-text-muted)] px-2">✕</button>
+              </div>
+            } @else {
+              <button (click)="startEditCompanion(reservation)" class="text-xs text-[var(--color-text-muted)] mt-1 underline decoration-dotted">
+                {{ reservation.companionName ? 'Pour : ' + reservation.companionName : '+ Préciser pour qui (optionnel)' }}
+              </button>
+            }
+
             <p class="text-xs text-[var(--color-text-muted)] mt-2">
               Réservation enregistrée. En attente de validation par l'administrateur pour télécharger le ticket.
             </p>
@@ -85,7 +103,24 @@
             <div class="text-xs text-[var(--color-gold)] flex items-center justify-center gap-1.5 mb-2 animate-heart-pulse">✦ VOTRE PLACE</div>
             <p class="font-display text-lg text-[var(--color-text)]">{{ reservation.table.name }}</p>
             <p class="text-xs text-[var(--color-text-muted)] mb-3">{{ reservation.table.description }}</p>
-            <p class="font-display text-2xl text-[var(--color-gold-bright)] mb-4">Place #{{ reservation.seatNumber }}</p>
+            <p class="font-display text-2xl text-[var(--color-gold-bright)] mb-2">Place #{{ reservation.seatNumber }}</p>
+
+            @if (editingCompanionId() === reservation.id) {
+              <div class="flex gap-2 mb-4 justify-center">
+                <input
+                  [(ngModel)]="companionNameInput"
+                  name="companionNameValidated-{{ reservation.id }}"
+                  placeholder="Nom de la personne (optionnel)"
+                  class="flex-1 max-w-[220px] bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
+                />
+                <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion()" class="text-xs text-[var(--color-success)] font-semibold px-2">✓</button>
+                <button (click)="editingCompanionId.set(null)" class="text-xs text-[var(--color-text-muted)] px-2">✕</button>
+              </div>
+            } @else {
+              <button (click)="startEditCompanion(reservation)" class="text-xs text-[var(--color-text-muted)] mb-4 underline decoration-dotted">
+                {{ reservation.companionName ? 'Pour : ' + reservation.companionName : '+ Préciser pour qui (optionnel)' }}
+              </button>
+            }
 
             @if (tickets()[reservation.id]; as t) {
               <app-qr-code

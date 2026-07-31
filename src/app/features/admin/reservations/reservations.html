@@ -76,7 +76,10 @@
               </span>
             </div>
             <p class="text-xs text-[var(--color-text-muted)]">{{ r.guest.linkToCouple }} · {{ r.guest.phone }}</p>
-            <p class="text-xs text-[var(--color-gold)]">Table {{ r.table.name }} · Place #{{ r.seatNumber }}</p>
+            <p class="text-xs text-[var(--color-gold)]">
+              Table {{ r.table.name }} · Place #{{ r.seatNumber }}
+              @if (r.companionName) { <span class="text-[var(--color-text-muted)]">(pour {{ r.companionName }})</span> }
+            </p>
           </div>
           <div class="flex items-center gap-2 shrink-0">
             @if (r.status === 'pending') {
