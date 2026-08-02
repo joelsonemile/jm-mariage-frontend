@@ -2,7 +2,7 @@
   <div class="flex items-start justify-between mb-1">
     <div>
       <h1 class="font-display text-2xl text-[var(--color-text)]">Comité d'organisation</h1>
-      <p class="text-xs text-[var(--color-text-muted)]">{{ members().length }} membres</p>
+      <p class="text-xs text-[var(--color-text-muted)]">{{ commissions().length }} comités · {{ members().length }} membres</p>
     </div>
     <div class="flex items-center gap-2 shrink-0">
       <button (click)="showManageCommissions.set(true)" class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap">
@@ -14,7 +14,7 @@
     </div>
   </div>
   <p class="text-[11px] text-[var(--color-text-muted)] mb-4">
-    Rôles principaux et membres des commissions — réservé à l'équipe d'organisation.
+    Un comité = le responsable principal d'une commission. La commission regroupe tous ses membres.
   </p>
 
   <input
@@ -45,36 +45,131 @@
   </div>
 
   @if (!loading()) {
-    <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredMembers().length }} résultat(s)</p>
-    <div class="flex flex-col gap-3">
-      @for (m of filteredMembers(); track m._id) {
-        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-start justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <p class="text-sm font-semibold text-[var(--color-text)]">{{ m.nom }}</p>
-              @if (m.commission) {
-                <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)]">
-                  {{ m.commission }}
-                </span>
-              }
+    @if (showGroupedView()) {
+      <!-- Rôles principaux : pas rattachés à une commission -->
+      @if (principalMembers().length) {
+        <p class="text-[11px] tracking-widest text-[var(--color-text-muted)] mt-4 mb-2">RÔLES PRINCIPAUX</p>
+        <div class="flex flex-col gap-3 mb-5">
+          @for (m of principalMembers(); track m._id) {
+            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-[var(--color-text)]">{{ m.nom }}</p>
+                @if (m.role) { <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p> }
+                @if (m.description) { <p class="text-xs text-[var(--color-text-soft)]/80 mt-1.5 leading-relaxed">{{ m.description }}</p> }
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
+                <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+              </div>
             </div>
-            @if (m.role) {
-              <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p>
-            }
-            @if (m.description) {
-              <p class="text-xs text-[var(--color-text-soft)]/80 mt-1.5 leading-relaxed">{{ m.description }}</p>
-            }
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
-            <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
-          </div>
+          }
         </div>
       }
-      @if (!filteredMembers().length) {
-        <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucun résultat.</p>
-      }
-    </div>
+
+      <!-- Un comité par commission : responsable en avant, membres repliables -->
+      <p class="text-[11px] tracking-widest text-[var(--color-text-muted)] mb-2">COMITÉS PAR COMMISSION</p>
+      <div class="flex flex-col gap-3">
+        @for (group of commissionGroups(); track group.commission._id) {
+          <div class="bg-[var(--color-surface)] border border-[var(--color-gold)]/25 rounded-xl p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="font-display text-[var(--color-gold)]">{{ group.commission.nom }}</p>
+                @if (group.commission.responsable) {
+                  <p class="text-sm text-[var(--color-text)] mt-1">
+                    Responsable : <strong>{{ group.commission.responsable.nom }}</strong>
+                  </p>
+                } @else {
+                  <p class="text-xs text-[var(--color-text-muted)] italic mt-1">Aucun responsable désigné</p>
+                }
+              </div>
+              <button (click)="openCreateForCommission(group.commission.nom)" class="text-xs border border-[var(--color-border)] rounded-full px-3 py-1.5 text-[var(--color-text-soft)] whitespace-nowrap shrink-0">
+                + Membre
+              </button>
+            </div>
+
+            @if (group.members.length) {
+              <div class="mt-3">
+                <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">DÉSIGNER LE RESPONSABLE</label>
+                <select
+                  [ngModel]="group.commission.responsable?._id || ''"
+                  (ngModelChange)="setResponsable(group.commission, $event)"
+                  [disabled]="settingResponsableFor() === group.commission._id"
+                  class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-soft)] outline-none"
+                >
+                  <option value="">— Aucun —</option>
+                  @for (m of group.members; track m._id) {
+                    <option [value]="m._id">{{ m.nom }}</option>
+                  }
+                </select>
+              </div>
+            }
+
+            <button (click)="toggleExpanded(group.commission._id)" class="text-xs text-[var(--color-gold)] mt-3">
+              {{ expandedCommissionId() === group.commission._id ? '▾' : '▸' }} {{ group.members.length }} membre(s)
+            </button>
+
+            @if (expandedCommissionId() === group.commission._id) {
+              <div class="flex flex-col gap-2 mt-3 border-t border-[var(--color-border)] pt-3">
+                @if (!group.members.length) {
+                  <p class="text-xs text-[var(--color-text-muted)] italic">Aucun membre pour le moment.</p>
+                }
+                @for (m of group.members; track m._id) {
+                  <div class="bg-[var(--color-bg-secondary)] rounded-lg p-3 flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-sm text-[var(--color-text)]">
+                        {{ m.nom }}
+                        @if (group.commission.responsable?._id === m._id) {
+                          <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)] ml-1">responsable</span>
+                        }
+                      </p>
+                      @if (m.role) { <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p> }
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <button (click)="openEdit(m)" class="w-7 h-7 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center text-xs">✎</button>
+                      <button (click)="deleting.set(m)" class="w-7 h-7 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center text-xs">🗑</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+        @if (!commissionGroups().length) {
+          <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucune commission pour le moment.</p>
+        }
+      </div>
+    } @else {
+      <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredMembers().length }} résultat(s)</p>
+      <div class="flex flex-col gap-3">
+        @for (m of filteredMembers(); track m._id) {
+          <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-start justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <p class="text-sm font-semibold text-[var(--color-text)]">{{ m.nom }}</p>
+                @if (m.commission) {
+                  <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)]">
+                    {{ m.commission }}
+                  </span>
+                }
+              </div>
+              @if (m.role) {
+                <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p>
+              }
+              @if (m.description) {
+                <p class="text-xs text-[var(--color-text-soft)]/80 mt-1.5 leading-relaxed">{{ m.description }}</p>
+              }
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
+              <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+            </div>
+          </div>
+        }
+        @if (!filteredMembers().length) {
+          <p class="text-sm text-[var(--color-text-muted)] text-center py-10">Aucun résultat.</p>
+        }
+      </div>
+    }
   }
 </div>
 
@@ -94,7 +189,6 @@
         [(ngModel)]="editForm.description"
         name="editDescription"
         rows="4"
-        placeholder="Détaillez les tâches et responsabilités de ce rôle..."
         class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none resize-y"
       ></textarea>
     </div>
@@ -122,7 +216,7 @@
     </div>
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">RÔLE / FONCTION</label>
-      <input [(ngModel)]="createForm.role" name="createRole" placeholder="Ex : Coordinateur Principal" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
+      <input [(ngModel)]="createForm.role" name="createRole" class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none" />
     </div>
     <div>
       <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">DESCRIPTION DE LA RESPONSABILITÉ</label>
@@ -130,7 +224,6 @@
         [(ngModel)]="createForm.description"
         name="createDescription"
         rows="4"
-        placeholder="Détaillez les tâches et responsabilités de ce rôle..."
         class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none resize-y"
       ></textarea>
     </div>

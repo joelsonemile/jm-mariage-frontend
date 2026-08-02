@@ -160,4 +160,13 @@ export class AdminService {
   async deleteCommission(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/commissions/${id}`));
   }
+
+  async setCommissionResponsable(commissionId: string, committeeMemberId: string | null): Promise<Commission> {
+    const res = await firstValueFrom(
+      this.http.put<{ data: { commission: Commission } }>(`${this.base}/commissions/${commissionId}/responsable`, {
+        committeeMemberId,
+      })
+    );
+    return res.data.commission;
+  }
 }

@@ -10,6 +10,11 @@ import { ButtonComponent } from '../../../shared/components/button/button';
 
 const PRINCIPAL_ROLE = '__principal__';
 
+interface CommissionGroup {
+  commission: Commission;
+  members: CommitteeMember[];
+}
+
 @Component({
   selector: 'app-admin-committee',
   standalone: true,
@@ -28,6 +33,23 @@ export class AdminCommitteeComponent implements OnInit {
     { value: PRINCIPAL_ROLE, label: 'Rôles principaux' },
     ...this.commissions().map((c) => ({ value: c.nom, label: c.nom })),
   ]);
+
+  // Vue par défaut : un "comité" (= une commission + son responsable) par carte,
+  // avec la liste de ses membres repliable. Dès qu'on cherche ou qu'on filtre sur
+  // une commission précise, on repasse en liste plate (plus pratique pour scanner).
+  readonly showGroupedView = computed(() => !this.search().trim() && this.commissionFilter() === 'all');
+
+  readonly principalMembers = computed(() => this.members().filter((m) => !m.commission));
+
+  readonly commissionGroups = computed<CommissionGroup[]>(() =>
+    this.commissions().map((commission) => ({
+      commission,
+      members: this.members().filter((m) => m.commission === commission.nom),
+    }))
+  );
+
+  readonly expandedCommissionId = signal<string | null>(null);
+  readonly settingResponsableFor = signal<string | null>(null);
 
   readonly editing = signal<CommitteeMember | null>(null);
   readonly showCreate = signal(false);
@@ -84,6 +106,26 @@ export class AdminCommitteeComponent implements OnInit {
     this.commissionFilter.set('all');
   }
 
+  toggleExpanded(commissionId: string): void {
+    this.expandedCommissionId.set(this.expandedCommissionId() === commissionId ? null : commissionId);
+  }
+
+  openCreateForCommission(commissionNom: string): void {
+    this.createForm = { nom: '', role: '', description: '', commission: commissionNom };
+    this.showCreate.set(true);
+  }
+
+  async setResponsable(commission: Commission, committeeMemberId: string): Promise<void> {
+    this.settingResponsableFor.set(commission._id);
+    try {
+      await this.adminService.setCommissionResponsable(commission._id, committeeMemberId || null);
+      this.toast.show(committeeMemberId ? 'Responsable désigné.' : 'Responsable retiré.', 'success');
+      await this.loadCommissions();
+    } finally {
+      this.settingResponsableFor.set(null);
+    }
+  }
+
   openEdit(member: CommitteeMember): void {
     this.editing.set(member);
     this.editForm = { nom: member.nom, role: member.role, description: member.description, commission: member.commission };
@@ -97,7 +139,7 @@ export class AdminCommitteeComponent implements OnInit {
       await this.adminService.updateCommitteeMember(member._id, this.editForm);
       this.toast.show('Membre du comité mis à jour.', 'success');
       this.editing.set(null);
-      await this.load();
+      await Promise.all([this.load(), this.loadCommissions()]);
     } finally {
       this.saving.set(false);
     }
@@ -123,7 +165,7 @@ export class AdminCommitteeComponent implements OnInit {
     await this.adminService.deleteCommitteeMember(member._id);
     this.toast.show('Membre retiré du comité.', 'success');
     this.deleting.set(null);
-    await this.load();
+    await Promise.all([this.load(), this.loadCommissions()]);
   }
 
   async addCommission(): Promise<void> {
