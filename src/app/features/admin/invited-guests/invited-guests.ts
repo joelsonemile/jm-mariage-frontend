@@ -38,6 +38,8 @@ export class AdminInvitedGuestsComponent implements OnInit {
   readonly saving = signal(false);
   readonly deleting = signal<InvitedGuest | null>(null);
 
+  readonly downloadingPdf = signal(false);
+
   readonly showManageCategories = signal(false);
   readonly newCategoryName = signal('');
   readonly editingCategory = signal<Category | null>(null);
@@ -144,6 +146,21 @@ export class AdminInvitedGuestsComponent implements OnInit {
     this.toast.show('Invité attendu supprimé.', 'success');
     this.deleting.set(null);
     await this.load();
+  }
+
+  async downloadPdf(): Promise<void> {
+    this.downloadingPdf.set(true);
+    try {
+      const blob = await this.adminService.exportInvitedGuestsPdf();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'invites-attendus-jm-mariage.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      this.downloadingPdf.set(false);
+    }
   }
 
   async addCategory(): Promise<void> {

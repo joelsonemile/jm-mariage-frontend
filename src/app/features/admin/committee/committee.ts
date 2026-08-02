@@ -76,6 +76,8 @@ export class AdminCommitteeComponent implements OnInit {
   readonly saving = signal(false);
   readonly deleting = signal<CommitteeMember | null>(null);
 
+  readonly downloadingPdf = signal(false);
+
   readonly showManageCommissions = signal(false);
   readonly newCommissionName = signal('');
   readonly editingCommission = signal<Commission | null>(null);
@@ -186,6 +188,21 @@ export class AdminCommitteeComponent implements OnInit {
     this.toast.show('Membre retiré du comité.', 'success');
     this.deleting.set(null);
     await Promise.all([this.load(), this.loadCommissions()]);
+  }
+
+  async downloadPdf(): Promise<void> {
+    this.downloadingPdf.set(true);
+    try {
+      const blob = await this.adminService.exportCommitteePdf();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'comite-organisation-jm-mariage.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      this.downloadingPdf.set(false);
+    }
   }
 
   async addCommission(): Promise<void> {

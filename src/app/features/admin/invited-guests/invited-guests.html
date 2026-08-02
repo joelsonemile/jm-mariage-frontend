@@ -7,6 +7,13 @@
       </p>
     </div>
     <div class="flex items-center gap-2 shrink-0">
+      <button
+        (click)="downloadPdf()"
+        [disabled]="downloadingPdf()"
+        class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap disabled:opacity-50"
+      >
+        {{ downloadingPdf() ? '…' : '⬇ PDF' }}
+      </button>
       <button (click)="showManageCategories.set(true)" class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap">
         ⚙ Catégories
       </button>

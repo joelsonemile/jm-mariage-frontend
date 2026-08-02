@@ -5,6 +5,13 @@
       <p class="text-xs text-[var(--color-text-muted)]">{{ commissions().length }} comités · {{ members().length }} membres</p>
     </div>
     <div class="flex items-center gap-2 shrink-0">
+      <button
+        (click)="downloadPdf()"
+        [disabled]="downloadingPdf()"
+        class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap disabled:opacity-50"
+      >
+        {{ downloadingPdf() ? '…' : '⬇ PDF' }}
+      </button>
       <button (click)="showManageCommissions.set(true)" class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap">
         ⚙ Commissions
       </button>

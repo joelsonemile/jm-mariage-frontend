@@ -102,6 +102,10 @@ export class AdminService {
     await firstValueFrom(this.http.delete(`${this.base}/invited-guests/${id}`));
   }
 
+  async exportInvitedGuestsPdf(): Promise<Blob> {
+    return firstValueFrom(this.http.get(`${this.base}/invited-guests/pdf`, { responseType: 'blob' }));
+  }
+
   async listCategories(): Promise<Category[]> {
     const res = await firstValueFrom(this.http.get<{ data: { categories: Category[] } }>(`${this.base}/categories`));
     return res.data.categories;
@@ -159,6 +163,10 @@ export class AdminService {
 
   async deleteCommission(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/commissions/${id}`));
+  }
+
+  async exportCommitteePdf(): Promise<Blob> {
+    return firstValueFrom(this.http.get(`${this.base}/committee/pdf`, { responseType: 'blob' }));
   }
 
   async setCommissionResponsable(commissionId: string, committeeMemberId: string | null): Promise<Commission> {
