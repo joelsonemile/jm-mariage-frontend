@@ -15,6 +15,11 @@ interface CommissionGroup {
   members: CommitteeMember[];
 }
 
+interface PrincipalRoleGroup {
+  role: string;
+  members: CommitteeMember[];
+}
+
 @Component({
   selector: 'app-admin-committee',
   standalone: true,
@@ -40,6 +45,21 @@ export class AdminCommitteeComponent implements OnInit {
   readonly showGroupedView = computed(() => !this.search().trim() && this.commissionFilter() === 'all');
 
   readonly principalMembers = computed(() => this.members().filter((m) => !m.commission));
+
+  // Regroupe les rôles principaux identiques (ex: "Co-responsable Logistique" x2)
+  // sous une seule étiquette pour éviter la redondance visuelle.
+  readonly principalRoleGroups = computed<PrincipalRoleGroup[]>(() => {
+    const groups = new Map<string, CommitteeMember[]>();
+    for (const m of this.principalMembers()) {
+      const key = m.role.trim() ? m.role.trim().toLowerCase() : `__single__${m._id}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(m);
+    }
+    return Array.from(groups.values()).map((members) => ({
+      role: members[0].role.trim(),
+      members,
+    }));
+  });
 
   readonly commissionGroups = computed<CommissionGroup[]>(() =>
     this.commissions().map((commission) => ({

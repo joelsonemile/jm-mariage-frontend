@@ -50,16 +50,33 @@
       @if (principalMembers().length) {
         <p class="text-[11px] tracking-widest text-[var(--color-text-muted)] mt-4 mb-2">RÔLES PRINCIPAUX</p>
         <div class="flex flex-col gap-3 mb-5">
-          @for (m of principalMembers(); track m._id) {
-            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex items-start justify-between gap-3">
-              <div>
-                <p class="text-sm font-semibold text-[var(--color-text)]">{{ m.nom }}</p>
-                @if (m.role) { <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p> }
-                @if (m.description) { <p class="text-xs text-[var(--color-text-soft)]/80 mt-1.5 leading-relaxed">{{ m.description }}</p> }
-              </div>
-              <div class="flex items-center gap-2 shrink-0">
-                <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
-                <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+          @for (group of principalRoleGroups(); track group.role + group.members[0]._id) {
+            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+              @if (group.role) {
+                <p class="text-xs tracking-wide text-[var(--color-gold)] font-semibold mb-2">
+                  {{ group.role }}
+                  @if (group.members.length > 1) {
+                    <span class="text-[var(--color-text-muted)] font-normal">({{ group.members.length }})</span>
+                  }
+                </p>
+              }
+              <div class="flex flex-col">
+                @for (m of group.members; track m._id; let idx = $index) {
+                  <div
+                    class="flex items-start justify-between gap-3"
+                    [class]="idx > 0 ? 'pt-2 mt-2 border-t border-[var(--color-border)]' : ''"
+                  >
+                    <div>
+                      <p class="text-sm font-semibold text-[var(--color-text)]">{{ m.nom }}</p>
+                      @if (!group.role && m.role) { <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p> }
+                      @if (m.description) { <p class="text-xs text-[var(--color-text-soft)]/80 mt-1.5 leading-relaxed">{{ m.description }}</p> }
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
+                      <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+                    </div>
+                  </div>
+                }
               </div>
             </div>
           }
