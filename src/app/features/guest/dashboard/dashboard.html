@@ -76,15 +76,15 @@
                 <input
                   [(ngModel)]="companionNameInput"
                   name="companionName-{{ reservation.id }}"
-                  placeholder="Nom de la personne (optionnel)"
+                  placeholder="Nom de la personne (obligatoire)"
                   class="flex-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
                 />
-                <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion()" class="text-xs text-[var(--color-success)] font-semibold px-2">✓</button>
+                <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion() || !companionNameInput.trim()" class="text-xs text-[var(--color-success)] font-semibold px-2 disabled:opacity-40">✓</button>
                 <button (click)="editingCompanionId.set(null)" class="text-xs text-[var(--color-text-muted)] px-2">✕</button>
               </div>
             } @else {
               <button (click)="startEditCompanion(reservation)" class="text-xs text-[var(--color-text-muted)] mt-1 underline decoration-dotted">
-                {{ reservation.companionName ? 'Pour : ' + reservation.companionName : '+ Préciser pour qui (optionnel)' }}
+                {{ reservation.companionName ? 'Pour : ' + reservation.companionName : '⚠ Préciser pour qui (obligatoire)' }}
               </button>
             }
 
@@ -110,15 +110,15 @@
                 <input
                   [(ngModel)]="companionNameInput"
                   name="companionNameValidated-{{ reservation.id }}"
-                  placeholder="Nom de la personne (optionnel)"
+                  placeholder="Nom de la personne (obligatoire)"
                   class="flex-1 max-w-[220px] bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
                 />
-                <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion()" class="text-xs text-[var(--color-success)] font-semibold px-2">✓</button>
+                <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion() || !companionNameInput.trim()" class="text-xs text-[var(--color-success)] font-semibold px-2 disabled:opacity-40">✓</button>
                 <button (click)="editingCompanionId.set(null)" class="text-xs text-[var(--color-text-muted)] px-2">✕</button>
               </div>
             } @else {
               <button (click)="startEditCompanion(reservation)" class="text-xs text-[var(--color-text-muted)] mb-4 underline decoration-dotted">
-                {{ reservation.companionName ? 'Pour : ' + reservation.companionName : '+ Préciser pour qui (optionnel)' }}
+                {{ reservation.companionName ? 'Pour : ' + reservation.companionName : '⚠ Préciser pour qui (obligatoire)' }}
               </button>
             }
 

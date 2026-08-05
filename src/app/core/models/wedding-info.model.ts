@@ -1,4 +1,5 @@
 export interface ProgramStep {
+  _id: string;
   time: string;
   title: string;
   description: string;

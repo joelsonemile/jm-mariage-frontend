@@ -59,7 +59,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   }
 
   async confirmReservation(): Promise<void> {
-    if (!this.selectedSeat()) return;
+    if (!this.selectedSeat() || !this.companionName.trim()) return;
     this.submitting.set(true);
     try {
       await this.reservationService.create(this.tableId, this.selectedSeat()!, this.companionName);

@@ -102,6 +102,7 @@ export class GuestDashboardComponent implements OnInit {
   }
 
   async saveCompanionName(reservation: MyReservation): Promise<void> {
+    if (!this.companionNameInput.trim()) return;
     this.savingCompanion.set(true);
     try {
       await this.reservationService.updateCompanionName(reservation.id, this.companionNameInput);
