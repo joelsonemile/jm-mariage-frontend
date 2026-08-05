@@ -305,11 +305,6 @@ body {
   }
 }
 
-.couple-frame {
-  -webkit-mask-image: radial-gradient(circle at center, black 55%, transparent 78%);
-  mask-image: radial-gradient(circle at center, black 55%, transparent 78%);
-}
-
 .orbit-a {
   position: absolute;
   inset: 0;
