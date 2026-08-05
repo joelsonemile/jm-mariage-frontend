@@ -8,7 +8,6 @@ export interface TableSummary {
   reservedCount: number;
   freeCount: number;
   isMyTable: boolean;
-  guestNames: string[];
 }
 
 export type SeatStatus = 'available' | 'taken' | 'mine';

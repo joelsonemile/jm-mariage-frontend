@@ -17,13 +17,6 @@
           <p class="text-[10px] text-[var(--color-text-muted)]">
             {{ table.isMyTable ? 'Votre table' : table.freeCount + ' libres' }}
           </p>
-          @if (table.guestNames.length) {
-            <div class="flex flex-wrap gap-1 justify-center mt-1">
-              @for (name of table.guestNames; track name) {
-                <span class="text-[9px] leading-none rounded-full px-1.5 py-0.5 bg-[var(--color-gold)]/15 text-[var(--color-gold)]">{{ name }}</span>
-              }
-            </div>
-          }
         </a>
       }
     </div>
