@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { WeddingInfoService } from '../../../core/services/wedding-info.service';
 import { WeddingInfo } from '../../../core/models/wedding-info.model';
 import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-guest-infos',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './infos.html',
 })
 export class GuestInfosComponent implements OnInit {

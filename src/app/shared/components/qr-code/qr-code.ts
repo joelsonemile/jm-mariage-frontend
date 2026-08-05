@@ -56,6 +56,27 @@ export class QrCodeComponent {
     });
   }
 
+  // Dessine un petit repère "sparkle" vectoriel plutôt qu'un glyphe emoji, dont
+  // le rendu dépend de la police système et varie selon les appareils.
+  private drawSparkle(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number): void {
+    const outer = size;
+    const inner = size * 0.32;
+    const points: [number, number][] = [
+      [cx, cy - outer],
+      [cx + inner, cy - inner],
+      [cx + outer, cy],
+      [cx + inner, cy + inner],
+      [cx, cy + outer],
+      [cx - inner, cy + inner],
+      [cx - outer, cy],
+      [cx - inner, cy - inner],
+    ];
+    ctx.beginPath();
+    points.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+    ctx.closePath();
+    ctx.fill();
+  }
+
   private roundRect(
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -99,7 +120,11 @@ export class QrCodeComponent {
 
     ctx.fillStyle = '#c9a84c';
     ctx.font = '600 20px Georgia, serif';
-    ctx.fillText('✦ VOTRE PLACE ✦', width / 2, 72);
+    const placeLabel = 'VOTRE PLACE';
+    const placeLabelWidth = ctx.measureText(placeLabel).width;
+    ctx.fillText(placeLabel, width / 2, 72);
+    this.drawSparkle(ctx, width / 2 - placeLabelWidth / 2 - 20, 67, 6);
+    this.drawSparkle(ctx, width / 2 + placeLabelWidth / 2 + 20, 67, 6);
 
     ctx.fillStyle = '#f5f5f5';
     ctx.font = '700 42px Georgia, serif';

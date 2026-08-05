@@ -7,11 +7,12 @@ import { InvitedGuest } from '../../../core/models/invited-guest.model';
 import { Category } from '../../../core/models/category.model';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-admin-invited-guests',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent, IconComponent],
   templateUrl: './invited-guests.html',
 })
 export class AdminInvitedGuestsComponent implements OnInit {

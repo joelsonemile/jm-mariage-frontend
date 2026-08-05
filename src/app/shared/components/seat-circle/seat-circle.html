@@ -1,6 +1,6 @@
 <button type="button" [class]="classes" (click)="onClick()">
   @if (seat.status === 'taken' && !selected) {
-    ✕
+    <app-icon name="close" class="w-3.5 h-3.5 inline-block" />
   } @else {
     {{ seat.seatNumber }}
   }

@@ -6,6 +6,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { AdminReservation, ReservationStatus } from '../../../core/models/reservation.model';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 type StatusFilter = 'all' | ReservationStatus;
 type SortOption = 'recent' | 'oldest' | 'name';
@@ -13,7 +14,7 @@ type SortOption = 'recent' | 'oldest' | 'name';
 @Component({
   selector: 'app-admin-reservations',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent, IconComponent],
   templateUrl: './reservations.html',
 })
 export class AdminReservationsComponent implements OnInit {

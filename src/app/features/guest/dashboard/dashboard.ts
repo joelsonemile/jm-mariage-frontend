@@ -13,6 +13,7 @@ import { RsvpStatus } from '../../../core/models/user.model';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { QrCodeComponent } from '../../../shared/components/qr-code/qr-code';
 import { ModalComponent } from '../../../shared/components/modal/modal';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 interface Ticket {
   qrDataUrl: string;
@@ -23,7 +24,7 @@ interface Ticket {
 @Component({
   selector: 'app-guest-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ButtonComponent, QrCodeComponent, ModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ButtonComponent, QrCodeComponent, ModalComponent, IconComponent],
   templateUrl: './dashboard.html',
 })
 export class GuestDashboardComponent implements OnInit {

@@ -5,6 +5,7 @@ import { AdminService } from '../../../core/services/admin.service';
 import { TableService } from '../../../core/services/table.service';
 import { AdminReservation } from '../../../core/models/reservation.model';
 import { TableSummary } from '../../../core/models/table.model';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 interface TableWithGuests extends TableSummary {
   guests: AdminReservation[];
@@ -15,7 +16,7 @@ type OccupancyFilter = 'all' | 'full' | 'available' | 'empty';
 @Component({
   selector: 'app-admin-tables',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './tables.html',
 })
 export class AdminTablesComponent implements OnInit {

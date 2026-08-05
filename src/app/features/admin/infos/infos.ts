@@ -5,12 +5,13 @@ import { WeddingInfoService } from '../../../core/services/wedding-info.service'
 import { ToastService } from '../../../core/services/toast.service';
 import { ProgramStep, WeddingInfo } from '../../../core/models/wedding-info.model';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { IconComponent } from '../../../shared/components/icon/icon';
 import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
 
 @Component({
   selector: 'app-admin-infos',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent],
   templateUrl: './infos.html',
 })
 export class AdminInfosComponent implements OnInit {

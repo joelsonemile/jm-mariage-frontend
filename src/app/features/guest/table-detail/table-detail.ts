@@ -10,11 +10,12 @@ import { TableDetail } from '../../../core/models/table.model';
 import { SeatCircleComponent } from '../../../shared/components/seat-circle/seat-circle';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-table-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SeatCircleComponent, ModalComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SeatCircleComponent, ModalComponent, ButtonComponent, IconComponent],
   templateUrl: './table-detail.html',
 })
 export class TableDetailComponent implements OnInit, OnDestroy {

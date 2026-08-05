@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { TableService } from '../../../core/services/table.service';
 import { SocketService } from '../../../core/services/socket.service';
 import { TableSummary } from '../../../core/models/table.model';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-guest-plan',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, IconComponent],
   templateUrl: './plan.html',
 })
 export class GuestPlanComponent implements OnInit, OnDestroy {

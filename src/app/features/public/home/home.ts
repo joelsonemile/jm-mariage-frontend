@@ -6,11 +6,12 @@ import { WeddingInfoService } from '../../../core/services/wedding-info.service'
 import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
 import { CountdownComponent } from '../../../shared/components/countdown/countdown';
 import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, CountdownComponent, ThemeToggleComponent],
+  imports: [CommonModule, RouterLink, CountdownComponent, ThemeToggleComponent, IconComponent],
   templateUrl: './home.html',
 })
 export class HomeComponent implements OnInit {

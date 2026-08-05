@@ -10,10 +10,10 @@
         [disabled]="downloadingPdf()"
         class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap disabled:opacity-50"
       >
-        {{ downloadingPdf() ? '…' : '⬇ PDF' }}
+        @if (downloadingPdf()) { … } @else { <app-icon name="download" class="w-3 h-3 inline-block align-[-1px]" /> PDF }
       </button>
       <button (click)="showManageCommissions.set(true)" class="text-xs border border-[var(--color-border)] rounded-full px-3.5 py-2 text-[var(--color-text-soft)] whitespace-nowrap">
-        ⚙ Commissions
+        <app-icon name="gear" class="w-3 h-3 inline-block align-[-1px]" /> Commissions
       </button>
       <button (click)="showCreate.set(true)" class="text-xs bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black rounded-full px-4 py-2 font-semibold whitespace-nowrap">
         + Ajouter
@@ -46,7 +46,7 @@
     }
     @if (search() || commissionFilter() !== 'all') {
       <button type="button" (click)="resetFilters()" class="text-xs text-[var(--color-text-muted)] px-2 whitespace-nowrap shrink-0">
-        ✕ Réinitialiser
+        <app-icon name="close" class="w-3 h-3 inline-block align-[-1px]" /> Réinitialiser
       </button>
     }
   </div>
@@ -79,8 +79,8 @@
                       @if (m.description) { <p class="text-xs text-[var(--color-text-soft)]/80 mt-1.5 leading-relaxed">{{ m.description }}</p> }
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                      <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
-                      <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+                      <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center p-2"><app-icon name="edit" /></button>
+                      <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center p-2"><app-icon name="trash" /></button>
                     </div>
                   </div>
                 }
@@ -129,7 +129,7 @@
             }
 
             <button (click)="toggleExpanded(group.commission._id)" class="text-xs text-[var(--color-gold)] mt-3">
-              {{ expandedCommissionId() === group.commission._id ? '▾' : '▸' }} {{ group.members.length }} membre(s)
+              <app-icon [name]="expandedCommissionId() === group.commission._id ? 'chevron-down' : 'chevron-right'" class="w-3 h-3 inline-block align-[-1px]" /> {{ group.members.length }} membre(s)
             </button>
 
             @if (expandedCommissionId() === group.commission._id) {
@@ -149,8 +149,8 @@
                       @if (m.role) { <p class="text-xs text-[var(--color-text-muted)]">{{ m.role }}</p> }
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                      <button (click)="openEdit(m)" class="w-7 h-7 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center text-xs">✎</button>
-                      <button (click)="deleting.set(m)" class="w-7 h-7 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center text-xs">🗑</button>
+                      <button (click)="openEdit(m)" class="w-7 h-7 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center p-1.5"><app-icon name="edit" /></button>
+                      <button (click)="deleting.set(m)" class="w-7 h-7 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center p-1.5"><app-icon name="trash" /></button>
                     </div>
                   </div>
                 }
@@ -184,8 +184,8 @@
               }
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
-              <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+              <button (click)="openEdit(m)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center p-2"><app-icon name="edit" /></button>
+              <button (click)="deleting.set(m)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center p-2"><app-icon name="trash" /></button>
             </div>
           </div>
         }
@@ -307,15 +307,15 @@
               name="editCommissionName-{{ c._id }}"
               class="flex-1 bg-transparent text-sm text-[var(--color-text-soft)] outline-none border-b border-[var(--color-gold)]"
             />
-            <button type="button" (click)="saveCommission()" [disabled]="commissionSaving()" class="text-xs text-[var(--color-success)] font-semibold px-2">✓</button>
-            <button type="button" (click)="editingCommission.set(null)" class="text-xs text-[var(--color-text-muted)] px-2">✕</button>
+            <button type="button" (click)="saveCommission()" [disabled]="commissionSaving()" class="w-6 h-6 p-1 text-[var(--color-success)]"><app-icon name="check" /></button>
+            <button type="button" (click)="editingCommission.set(null)" class="w-6 h-6 p-1 text-[var(--color-text-muted)]"><app-icon name="close" /></button>
           } @else {
             <span class="flex-1 text-sm text-[var(--color-text-soft)]">
               {{ c.nom }}
               <span class="text-[var(--color-text-muted)]">({{ memberCountByCommission().get(c.nom) || 0 }})</span>
             </span>
-            <button type="button" (click)="startEditCommission(c)" class="w-7 h-7 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center text-xs">✎</button>
-            <button type="button" (click)="deletingCommission.set(c)" class="w-7 h-7 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center text-xs">🗑</button>
+            <button type="button" (click)="startEditCommission(c)" class="w-7 h-7 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center p-1.5"><app-icon name="edit" /></button>
+            <button type="button" (click)="deletingCommission.set(c)" class="w-7 h-7 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center p-1.5"><app-icon name="trash" /></button>
           }
         </div>
       }

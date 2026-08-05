@@ -7,6 +7,7 @@ import { CommitteeMember } from '../../../core/models/committee-member.model';
 import { Commission } from '../../../core/models/commission.model';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 const PRINCIPAL_ROLE = '__principal__';
 
@@ -23,7 +24,7 @@ interface PrincipalRoleGroup {
 @Component({
   selector: 'app-admin-committee',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent, IconComponent],
   templateUrl: './committee.html',
 })
 export class AdminCommitteeComponent implements OnInit {

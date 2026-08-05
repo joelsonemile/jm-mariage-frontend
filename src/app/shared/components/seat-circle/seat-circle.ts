@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Seat } from '../../../core/models/table.model';
+import { IconComponent } from '../icon/icon';
 
 @Component({
   selector: 'app-seat-circle',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './seat-circle.html',
 })
 export class SeatCircleComponent {

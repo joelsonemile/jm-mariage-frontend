@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { WeddingInfoService } from '../../../core/services/wedding-info.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-admin-gifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent],
   templateUrl: './gifts.html',
 })
 export class AdminGiftsComponent implements OnInit {

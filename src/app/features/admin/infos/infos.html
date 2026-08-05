@@ -84,7 +84,11 @@
                 [disabled]="savingStepId() === step._id"
                 class="text-xs rounded-full px-4 py-1.5 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold disabled:opacity-50"
               >
-                {{ savingStepId() === step._id ? '…' : '✓ Enregistrer' }}
+                @if (savingStepId() === step._id) {
+                  …
+                } @else {
+                  <app-icon name="check" class="w-3 h-3 inline-block align-[-1px]" /> Enregistrer
+                }
               </button>
             </div>
           } @else {
@@ -94,8 +98,8 @@
                 @if (step.description) { <p class="text-xs text-[var(--color-text-muted)] mt-1">{{ step.description }}</p> }
               </div>
               <div class="flex items-center gap-2 shrink-0">
-                <button type="button" (click)="startEdit(step)" class="w-8 h-8 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
-                <button type="button" (click)="removeStep(step)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+                <button type="button" (click)="startEdit(step)" class="w-8 h-8 rounded-full bg-[var(--color-surface)] text-[var(--color-text-soft)] flex items-center justify-center p-2"><app-icon name="edit" /></button>
+                <button type="button" (click)="removeStep(step)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center p-2"><app-icon name="trash" /></button>
               </div>
             </div>
           }

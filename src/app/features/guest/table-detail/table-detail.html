@@ -54,7 +54,7 @@
 
 <app-modal [open]="showPendingInfo()" [closable]="false">
   <div class="text-center">
-    <div class="text-3xl mb-2">⏱</div>
+    <app-icon name="timer" class="w-8 h-8 mx-auto mb-2 text-[var(--color-gold)]" />
     <h3 class="font-display text-lg text-[var(--color-gold)] mb-2">Réservation enregistrée</h3>
     <p class="text-sm text-[var(--color-text-soft)] mb-1">
       La place #{{ selectedSeat() }} à la Table {{ detail()?.table?.name }}

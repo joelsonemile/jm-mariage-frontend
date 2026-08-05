@@ -42,7 +42,7 @@
     <app-button type="submit" [loading]="loading()">Enregistrer</app-button>
   </form>
 
-  <button (click)="logout()" class="w-full mt-4 text-sm rounded-full py-3 border border-[var(--color-error)] text-[var(--color-error)]">
-    ↪ Se déconnecter
+  <button (click)="logout()" class="w-full mt-4 text-sm rounded-full py-3 border border-[var(--color-error)] text-[var(--color-error)] inline-flex items-center justify-center gap-1.5">
+    <app-icon name="log-out" class="w-3.5 h-3.5" /> Se déconnecter
   </button>
 </div>

@@ -6,7 +6,7 @@
     >
       <div class="flex items-start justify-between gap-3">
         <span>{{ toast.message }}</span>
-        <button class="text-[var(--color-text-muted)]" (click)="toastService.dismiss(toast.id)">✕</button>
+        <button class="w-3.5 h-3.5 shrink-0 text-[var(--color-text-muted)]" (click)="toastService.dismiss(toast.id)"><app-icon name="close" /></button>
       </div>
     </div>
   }

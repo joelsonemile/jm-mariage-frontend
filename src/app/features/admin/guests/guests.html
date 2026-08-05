@@ -47,7 +47,7 @@
       </select>
       @if (search() || linkFilter() !== 'all' || reservationFilter() !== 'all') {
         <button type="button" (click)="resetFilters()" class="text-xs text-[var(--color-text-muted)] px-2 whitespace-nowrap">
-          ✕ Réinitialiser
+          <app-icon name="close" class="w-3 h-3 inline-block align-[-1px]" /> Réinitialiser
         </button>
       }
     </div>
@@ -74,8 +74,8 @@
             }
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <button (click)="openEdit(g)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center">✎</button>
-            <button (click)="deleting.set(g)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center">🗑</button>
+            <button (click)="openEdit(g)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center p-2"><app-icon name="edit" /></button>
+            <button (click)="deleting.set(g)" class="w-8 h-8 rounded-full bg-[var(--color-error)]/15 text-[var(--color-error)] flex items-center justify-center p-2"><app-icon name="trash" /></button>
           </div>
         </div>
       }

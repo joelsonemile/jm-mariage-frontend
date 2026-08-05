@@ -43,8 +43,8 @@
   <main
     class="relative z-10 flex-1 flex flex-col items-center px-6 pt-14 pb-10 max-w-md mx-auto w-full text-center"
   >
-    <div class="text-[var(--color-gold)] text-xs tracking-[0.3em] mb-3 animate-fade-in-up">
-      ✦ EMBARQUEMENT ✦
+    <div class="text-[var(--color-gold)] text-xs tracking-[0.3em] mb-3 animate-fade-in-up flex items-center justify-center gap-1.5">
+      <app-icon name="sparkle" class="w-2.5 h-2.5" /> EMBARQUEMENT <app-icon name="sparkle" class="w-2.5 h-2.5" />
     </div>
 
     <div class="relative w-56 h-56 mx-auto mb-6 animate-fade-in-up delay-1">
@@ -59,16 +59,16 @@
       </div>
 
       <div class="absolute -inset-3 orbit-a">
-        <span class="ring-icon ring-icon-top">💍</span>
+        <span class="ring-icon ring-icon-top"><app-icon name="ring" class="w-full h-full" /></span>
       </div>
       <div class="absolute -inset-3 orbit-b">
-        <span class="ring-icon ring-icon-top">✦</span>
+        <span class="ring-icon ring-icon-top"><app-icon name="sparkle" class="w-full h-full" /></span>
       </div>
       <div class="absolute -inset-6 orbit-c">
-        <span class="ring-icon ring-icon-top ring-icon-sm">✦</span>
+        <span class="ring-icon ring-icon-top ring-icon-sm"><app-icon name="sparkle" class="w-full h-full" /></span>
       </div>
       <div class="absolute -inset-6 orbit-d">
-        <span class="ring-icon ring-icon-top ring-icon-sm">♡</span>
+        <span class="ring-icon ring-icon-top ring-icon-sm"><app-icon name="heart" class="w-full h-full" /></span>
       </div>
     </div>
 
@@ -170,7 +170,7 @@
         [queryParams]="{ mode: 'register' }"
         class="inline-flex items-center justify-center gap-2 rounded-full font-semibold text-sm px-6 py-3.5 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black shadow-[0_0_20px_rgba(255,215,0,0.25)] transition-transform active:scale-95 hover:scale-[1.02]"
       >
-        ✈ Embarquer maintenant
+        <app-icon name="plane" class="w-4 h-4" /> Embarquer maintenant
       </a>
 
       <a

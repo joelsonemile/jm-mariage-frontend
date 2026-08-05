@@ -7,13 +7,14 @@ import { AdminGuest } from '../../../core/models/reservation.model';
 import { LINKS_TO_COUPLE, LinkToCouple } from '../../../core/models/user.model';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { ButtonComponent } from '../../../shared/components/button/button';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 type ReservationFilter = 'all' | 'reserved' | 'none' | 'pending' | 'validated';
 
 @Component({
   selector: 'app-admin-guests',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, ModalComponent, ButtonComponent, IconComponent],
   templateUrl: './guests.html',
 })
 export class AdminGuestsComponent implements OnInit {

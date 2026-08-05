@@ -348,16 +348,17 @@ body {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
   color: var(--color-gold-bright);
-  text-shadow:
-    0 0 10px rgba(255, 215, 0, 0.7),
-    0 0 20px rgba(255, 215, 0, 0.35);
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7)) drop-shadow(0 0 12px rgba(255, 215, 0, 0.35));
   animation: ring-pulse 3s ease-in-out infinite;
 }
 
 .ring-icon-sm {
-  font-size: 11px;
+  width: 11px;
+  height: 11px;
 }
 
 @keyframes ring-pulse {

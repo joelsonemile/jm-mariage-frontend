@@ -17,7 +17,7 @@
     @for (item of items(); track $index; let i = $index) {
       <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 flex items-center justify-between">
         <span class="text-sm text-[var(--color-text-soft)]">{{ item }}</span>
-        <button (click)="removeItem(i)" class="text-[var(--color-error)] text-sm">🗑</button>
+        <button (click)="removeItem(i)" class="w-4 h-4 text-[var(--color-error)]"><app-icon name="trash" /></button>
       </div>
     }
     @if (!items().length) {
