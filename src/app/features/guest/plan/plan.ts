@@ -4,17 +4,15 @@ import { RouterLink } from '@angular/router';
 import { TableService } from '../../../core/services/table.service';
 import { SocketService } from '../../../core/services/socket.service';
 import { TableSummary } from '../../../core/models/table.model';
-import { IconComponent } from '../../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-guest-plan',
   standalone: true,
-  imports: [CommonModule, RouterLink, IconComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './plan.html',
 })
 export class GuestPlanComponent implements OnInit, OnDestroy {
   readonly tables = signal<TableSummary[]>([]);
-  readonly honorTable = signal<TableSummary | null>(null);
   readonly loading = signal(true);
   private unsubscribe: (() => void) | null = null;
 
@@ -32,7 +30,6 @@ export class GuestPlanComponent implements OnInit, OnDestroy {
 
   async load(): Promise<void> {
     const tables = await this.tableService.list();
-    this.honorTable.set(tables.find((t) => t.isHonorTable) || null);
     this.tables.set(tables.filter((t) => !t.isHonorTable).sort((a, b) => a.order - b.order));
   }
 

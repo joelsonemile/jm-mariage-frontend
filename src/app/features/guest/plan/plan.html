@@ -2,14 +2,6 @@
   <h1 class="font-display text-2xl text-[var(--color-text)]">Plan de salle</h1>
   <p class="text-xs text-[var(--color-text-muted)] mb-6">Touchez une table pour réserver votre place</p>
 
-  @if (honorTable()) {
-    <div class="bg-gradient-to-b from-[var(--color-gold)]/15 to-transparent border border-[var(--color-gold)] rounded-2xl p-6 text-center mb-4">
-      <app-icon name="crown" class="w-8 h-8 mx-auto mb-2 text-[var(--color-gold)]" />
-      <p class="font-display text-[var(--color-gold)] text-lg">Table d'Honneur</p>
-      <p class="text-xs text-[var(--color-text-muted)]">Joelson &amp; Marjorie</p>
-    </div>
-  }
-
   @if (!loading()) {
     <div class="grid grid-cols-2 gap-3">
       @for (table of tables(); track table.id) {
@@ -25,6 +17,13 @@
           <p class="text-[10px] text-[var(--color-text-muted)]">
             {{ table.isMyTable ? 'Votre table' : table.freeCount + ' libres' }}
           </p>
+          @if (table.guestNames.length) {
+            <div class="flex flex-wrap gap-1 justify-center mt-1">
+              @for (name of table.guestNames; track name) {
+                <span class="text-[9px] leading-none rounded-full px-1.5 py-0.5 bg-[var(--color-gold)]/15 text-[var(--color-gold)]">{{ name }}</span>
+              }
+            </div>
+          }
         </a>
       }
     </div>
