@@ -5,17 +5,33 @@
     <h1 class="font-display text-2xl text-[var(--color-gold)]">Table {{ detail()!.table.name }}</h1>
     <p class="text-xs text-[var(--color-text-muted)] mb-6">{{ detail()!.table.description }}</p>
 
-    <div class="relative w-72 h-72 mx-auto bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl">
+    <div class="relative w-72 h-72 mx-auto my-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl">
       <div
         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-[var(--color-gold)] flex items-center justify-center"
       >
         <span class="font-display text-[var(--color-gold)] text-center px-2">{{ detail()!.table.name }}</span>
       </div>
 
+      <svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible" viewBox="0 0 288 288">
+        @for (seat of detail()!.seats; track seat.seatNumber; let i = $index) {
+          @if (seat.status === 'taken' && seat.guestFirstName) {
+            <path [attr.d]="stemPath(i, detail()!.seats.length)" stroke="var(--color-gold)" stroke-opacity="0.45" stroke-width="1" fill="none" />
+          }
+        }
+      </svg>
+
       @for (seat of detail()!.seats; track seat.seatNumber; let i = $index) {
         <div [style]="seatStyle(i, detail()!.seats.length)">
           <app-seat-circle [seat]="seat" [selected]="selectedSeat() === seat.seatNumber" (picked)="pickSeat($event)"></app-seat-circle>
         </div>
+        @if (seat.status === 'taken' && seat.guestFirstName) {
+          <div
+            [style]="labelStyle(i, detail()!.seats.length)"
+            class="max-w-[64px] truncate text-[9px] leading-none rounded-full px-1.5 py-1 bg-[var(--color-gold)]/15 text-[var(--color-gold)] border border-[var(--color-gold)]/30"
+          >
+            {{ seat.guestFirstName }}
+          </div>
+        }
       }
     </div>
 

@@ -79,10 +79,14 @@ export class TableDetailComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('/guest');
   }
 
+  private seatAngle(index: number, total: number): number {
+    return (2 * Math.PI * index) / total - Math.PI / 2;
+  }
+
   // Positionne chaque siège en cercle autour du centre (nom de la table).
   seatStyle(index: number, total: number): Record<string, string> {
     const radius = 118;
-    const angle = (2 * Math.PI * index) / total - Math.PI / 2;
+    const angle = this.seatAngle(index, total);
     const x = radius * Math.cos(angle);
     const y = radius * Math.sin(angle);
     return {
@@ -90,5 +94,35 @@ export class TableDetailComponent implements OnInit, OnDestroy {
       left: `calc(50% + ${x}px - 22px)`,
       top: `calc(50% + ${y}px - 22px)`,
     };
+  }
+
+  // Badge nominatif hors du cercle des places (jamais dans le rond du siège,
+  // trop petit) : ancré au bout de la "tige" reliant le siège au nom, décalé
+  // vers l'intérieur ou l'extérieur selon le côté pour rester lisible.
+  labelStyle(index: number, total: number): Record<string, string> {
+    const radius = 150;
+    const angle = this.seatAngle(index, total);
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    const cos = Math.cos(angle);
+    const translateX = cos > 0.2 ? '0%' : cos < -0.2 ? '-100%' : '-50%';
+    return {
+      position: 'absolute',
+      left: `calc(50% + ${x}px)`,
+      top: `calc(50% + ${y}px)`,
+      transform: `translate(${translateX}, -50%)`,
+    };
+  }
+
+  // Trace la tige (ligne) entre le bord du siège et le badge du nom.
+  stemPath(index: number, total: number): string {
+    const angle = this.seatAngle(index, total);
+    const inner = 142;
+    const outer = 148;
+    const x1 = 144 + inner * Math.cos(angle);
+    const y1 = 144 + inner * Math.sin(angle);
+    const x2 = 144 + outer * Math.cos(angle);
+    const y2 = 144 + outer * Math.sin(angle);
+    return `M ${x1} ${y1} L ${x2} ${y2}`;
   }
 }
