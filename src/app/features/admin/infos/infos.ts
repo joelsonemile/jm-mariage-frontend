@@ -21,6 +21,7 @@ export class AdminInfosComponent implements OnInit {
   readonly steps = signal<ProgramStep[]>([]);
   readonly editingStepId = signal<string | null>(null);
   readonly savingStepId = signal<string | null>(null);
+  readonly downloadingPdf = signal(false);
   stepDraft: Partial<ProgramStep> = { time: '', title: '', description: '' };
 
   constructor(
@@ -80,6 +81,21 @@ export class AdminInfosComponent implements OnInit {
 
   trackById(_: number, step: ProgramStep): string {
     return step._id;
+  }
+
+  async downloadPdf(): Promise<void> {
+    this.downloadingPdf.set(true);
+    try {
+      const blob = await this.weddingInfoService.exportProgramPdf();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'programme-jm-mariage.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      this.downloadingPdf.set(false);
+    }
   }
 
   async save(): Promise<void> {

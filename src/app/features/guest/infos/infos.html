@@ -3,6 +3,14 @@
     <div class="text-center mb-6">
       <h1 class="font-display text-2xl text-[var(--color-gold)]">JM</h1>
       <p class="font-accent text-[var(--color-text-soft)]">Joelson &amp; Marjorie</p>
+      <button
+        type="button"
+        (click)="downloadPdf()"
+        [disabled]="downloadingPdf()"
+        class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-4 py-2 border border-[var(--color-gold)] text-[var(--color-gold)] disabled:opacity-50"
+      >
+        <app-icon name="download" class="w-3.5 h-3.5" /> {{ downloadingPdf() ? 'Génération…' : 'Télécharger le programme (PDF)' }}
+      </button>
     </div>
 
     <div class="flex flex-col gap-3">

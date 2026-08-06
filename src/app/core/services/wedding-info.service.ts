@@ -42,4 +42,8 @@ export class WeddingInfoService {
     );
     return res.data.info;
   }
+
+  async exportProgramPdf(): Promise<Blob> {
+    return firstValueFrom(this.http.get(`${environment.apiUrl}/wedding-info/program/pdf`, { responseType: 'blob' }));
+  }
 }
