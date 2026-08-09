@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WeddingInfoService } from '../../../core/services/wedding-info.service';
@@ -22,7 +22,23 @@ export class AdminInfosComponent implements OnInit {
   readonly editingStepId = signal<string | null>(null);
   readonly savingStepId = signal<string | null>(null);
   readonly downloadingPdf = signal(false);
-  stepDraft: Partial<ProgramStep> = { time: '', title: '', description: '' };
+  stepDraft: Partial<ProgramStep> = { time: '', title: '', description: '', section: '' };
+
+  // Regroupe les étapes par section (Journée / Soirée / ...) dans leur ordre
+  // d'apparition, pour un aperçu admin fidèle à ce que voient les invités.
+  readonly stepGroups = computed(() => {
+    const groups: { section: string; steps: ProgramStep[] }[] = [];
+    for (const step of this.steps()) {
+      const key = step.section || '';
+      let group = groups.find((g) => g.section === key);
+      if (!group) {
+        group = { section: key, steps: [] };
+        groups.push(group);
+      }
+      group.steps.push(step);
+    }
+    return groups;
+  });
 
   constructor(
     private weddingInfoService: WeddingInfoService,
@@ -46,8 +62,13 @@ export class AdminInfosComponent implements OnInit {
 
   // Chaque étape du programme est persistée immédiatement (CRUD dédié), séparément
   // du bouton "Enregistrer" global qui ne couvre que le reste du formulaire.
-  async addStep(): Promise<void> {
-    const info = await this.weddingInfoService.addProgramStep({ time: '', title: '', description: '' });
+  async addStep(defaultSection = ''): Promise<void> {
+    const info = await this.weddingInfoService.addProgramStep({
+      time: '',
+      title: '',
+      description: '',
+      section: defaultSection,
+    });
     this.steps.set(info.programDetailed);
     const created = info.programDetailed[info.programDetailed.length - 1];
     this.startEdit(created);
@@ -55,7 +76,7 @@ export class AdminInfosComponent implements OnInit {
 
   startEdit(step: ProgramStep): void {
     this.editingStepId.set(step._id);
-    this.stepDraft = { time: step.time, title: step.title, description: step.description };
+    this.stepDraft = { time: step.time, title: step.title, description: step.description, section: step.section };
   }
 
   async saveStep(): Promise<void> {

@@ -3,6 +3,7 @@ export interface ProgramStep {
   time: string;
   title: string;
   description: string;
+  section: string;
 }
 
 export interface WeddingInfo {

@@ -23,7 +23,9 @@ export type IconName =
   | 'circle-dot'
   | 'crown'
   | 'warning'
-  | 'log-out';
+  | 'log-out'
+  | 'sun'
+  | 'moon';
 
 @Component({
   selector: 'app-icon',
