@@ -100,6 +100,11 @@ export const routes: Routes = [
         path: 'infos',
         loadComponent: () => import('./features/admin/infos/infos').then((m) => m.AdminInfosComponent),
       },
+      {
+        path: 'messages',
+        loadComponent: () =>
+          import('./features/admin/messages/messages').then((m) => m.AdminMessagesComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

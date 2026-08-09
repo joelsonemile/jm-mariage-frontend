@@ -1,0 +1,165 @@
+<div class="px-5 pt-6 pb-6 max-w-2xl mx-auto">
+  <h1 class="font-display text-2xl text-[var(--color-text)]">Messages</h1>
+  <p class="text-xs text-[var(--color-text-muted)] mb-5">
+    Envoyer l'invitation en ligne par WhatsApp aux invités attendus.
+  </p>
+
+  @if (!loading()) {
+    <!-- Destinataires -->
+    <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4 mb-4">
+      <p class="text-[10px] tracking-widest text-[var(--color-text-muted)] mb-2">DESTINATAIRES</p>
+
+      <div class="flex gap-2 mb-3">
+        <button
+          type="button"
+          (click)="setMode('individual')"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="mode() === 'individual'
+            ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+            : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          Invités spécifiques
+        </button>
+        <button
+          type="button"
+          (click)="setMode('category')"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="mode() === 'category'
+            ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+            : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          Catégorie
+        </button>
+        <button
+          type="button"
+          (click)="setMode('all')"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="mode() === 'all'
+            ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+            : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          Tous les invités
+        </button>
+      </div>
+
+      @if (mode() === 'individual') {
+        <input
+          [(ngModel)]="search"
+          name="search"
+          placeholder="Rechercher un invité..."
+          class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-2 focus:border-[var(--color-gold)] outline-none"
+        />
+        <div class="max-h-60 overflow-y-auto flex flex-col gap-0.5 border border-[var(--color-border)] rounded-xl p-1.5">
+          @for (g of filteredForPicker(); track g._id) {
+            <label class="flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg cursor-pointer">
+              <input
+                type="checkbox"
+                [checked]="selectedIds().has(g._id)"
+                (change)="toggleGuest(g._id)"
+                class="accent-[var(--color-gold)]"
+              />
+              <span class="flex-1 text-[var(--color-text)]">{{ g.nom }} {{ g.prenom }}</span>
+              <span class="text-xs text-[var(--color-text-muted)]">{{ g.telephone || 'Pas de numéro' }}</span>
+            </label>
+          } @empty {
+            <p class="text-xs text-[var(--color-text-muted)] py-3 text-center">Aucun invité trouvé.</p>
+          }
+        </div>
+        <p class="text-[11px] text-[var(--color-text-muted)] mt-2">{{ selectedIds().size }} invité(s) sélectionné(s)</p>
+      }
+
+      @if (mode() === 'category') {
+        <select
+          [(ngModel)]="selectedCategory"
+          name="category"
+          class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] outline-none focus:border-[var(--color-gold)]"
+        >
+          <option value="">— Choisir une catégorie —</option>
+          @for (c of categories(); track c._id) {
+            <option [value]="c.nom">{{ c.nom }} ({{ categoryCounts().get(c.nom) || 0 }})</option>
+          }
+        </select>
+      }
+
+      @if (mode() === 'all') {
+        <p class="text-sm text-[var(--color-text-soft)]">
+          {{ invitedGuests().length }} invité(s) au total recevront ce message.
+        </p>
+      }
+    </div>
+
+    <!-- Rédaction du message -->
+    <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4 mb-4">
+      <p class="text-[10px] tracking-widest text-[var(--color-text-muted)] mb-2">RÉDACTION DU MESSAGE</p>
+      <textarea
+        [(ngModel)]="messageBody"
+        name="messageBody"
+        rows="6"
+        class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none resize-y focus:border-[var(--color-gold)]"
+      ></textarea>
+      <div class="flex items-center justify-between mt-2">
+        <button type="button" (click)="insertFirstNameToken()" class="text-xs text-[var(--color-gold)]">
+          + Insérer le prénom
+        </button>
+        <span class="text-[11px] text-[var(--color-text-muted)]">{{ '{{prenom}}' }} sera remplacé par le prénom de chacun</span>
+      </div>
+
+      <p class="text-[11px] text-[var(--color-text-muted)] mt-3">
+        Le lien de l'invitation en ligne est ajouté automatiquement à la fin du message et ne peut pas être retiré :
+        <span class="text-[var(--color-gold)]">{{ invitationLink }}</span>
+      </p>
+
+      <div class="mt-3 border-t border-[var(--color-border)] pt-3">
+        <p class="text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">APERÇU</p>
+        <p class="text-xs text-[var(--color-text-soft)] whitespace-pre-wrap bg-[var(--color-bg-secondary)] rounded-xl p-3">{{ previewMessage() }}</p>
+      </div>
+    </div>
+
+    <!-- Envoi -->
+    <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-[10px] tracking-widest text-[var(--color-text-muted)]">
+          ENVOI ({{ reachableCount() }}/{{ recipients().length }} joignables)
+        </p>
+        @if (sentIds().size > 0) {
+          <button type="button" (click)="resetSent()" class="text-xs text-[var(--color-text-muted)]">
+            Réinitialiser le suivi
+          </button>
+        }
+      </div>
+
+      @if (!recipients().length) {
+        <p class="text-sm text-[var(--color-text-muted)] italic py-6 text-center">Aucun destinataire sélectionné.</p>
+      } @else {
+        <div class="flex flex-col gap-2">
+          @for (g of recipients(); track g._id) {
+            <div class="flex items-center justify-between gap-3 bg-[var(--color-bg-secondary)] rounded-xl p-3">
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-[var(--color-text)] truncate">{{ g.nom }} {{ g.prenom }}</p>
+                <p class="text-xs text-[var(--color-text-muted)]">{{ g.telephone || 'Pas de numéro' }}</p>
+              </div>
+              @if (hasValidPhone(g)) {
+                <button
+                  type="button"
+                  (click)="openWhatsApp(g)"
+                  class="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3.5 py-2 transition-colors"
+                  [class]="sentIds().has(g._id)
+                    ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
+                    : 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black'"
+                >
+                  @if (sentIds().has(g._id)) {
+                    <app-icon name="check" class="w-3.5 h-3.5" /> Envoyé
+                  } @else {
+                    <app-icon name="message" class="w-3.5 h-3.5" /> WhatsApp
+                  }
+                </button>
+              } @else {
+                <span class="shrink-0 text-[10px] text-[var(--color-error)]">Numéro invalide</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
