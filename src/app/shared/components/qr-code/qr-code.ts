@@ -115,12 +115,31 @@ export class QrCodeComponent {
     ctx.restore();
   }
 
+  // La hauteur du canevas doit être calculée AVANT de dessiner (impossible de
+  // redimensionner après coup). Ce calcul reproduit exactement les mêmes
+  // incréments verticaux que composeTicketImage() ci-dessous — si l'un des
+  // deux change, l'autre doit être mis à jour, sous peine de voir le bas du
+  // billet téléchargé coupé (c'est le bug qui a motivé cette fonction dédiée).
+  private computeTicketHeight(singleTable: boolean, seatsCount: number): number {
+    let cursorY = 162;
+    cursorY += singleTable ? 42 + 34 + 26 : 26;
+    cursorY += 46; // tige jusqu'au QR
+    cursorY += 300 + 32 + 34; // boîte QR + légende
+    cursorY += 34; // légende jusqu'à la tige suivante
+    cursorY += 40; // tige jusqu'au libellé PLACES
+    cursorY += 30; // libellé PLACES jusqu'à la 1ère ligne
+    cursorY += seatsCount * 40;
+    cursorY += 20; // avant le pied de page
+    return cursorY + 34; // marge basse après le pied de page
+  }
+
   private async composeTicketImage(): Promise<string> {
     const qrImg = await this.loadImage(this.dataUrl);
     const width = 640;
     const seatsCount = this.seats.length;
-    const seatsBlockHeight = 56 + seatsCount * 40;
-    const height = 620 + seatsBlockHeight;
+    const tableNames = this.uniqueTableNames;
+    const singleTable = tableNames.length === 1;
+    const height = this.computeTicketHeight(singleTable, seatsCount);
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -167,8 +186,7 @@ export class QrCodeComponent {
     ctx.fillText(this.guestName || 'Invité', width / 2, 162);
 
     let cursorY = 162;
-    const tableNames = this.uniqueTableNames;
-    if (tableNames.length === 1) {
+    if (singleTable) {
       cursorY += 42;
       ctx.fillStyle = '#8a8175';
       ctx.font = '600 12px Georgia, serif';
