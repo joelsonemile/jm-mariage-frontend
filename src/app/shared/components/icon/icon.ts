@@ -25,7 +25,8 @@ export type IconName =
   | 'warning'
   | 'log-out'
   | 'sun'
-  | 'moon';
+  | 'moon'
+  | 'ticket';
 
 @Component({
   selector: 'app-icon',
