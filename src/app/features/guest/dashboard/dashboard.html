@@ -64,6 +64,16 @@
 
   @if (!loading()) {
     <div class="flex flex-col gap-4">
+      @if (groupTicket(); as t) {
+        <app-qr-code
+          [dataUrl]="t.qrDataUrl"
+          [guestName]="t.guestName"
+          [seats]="t.seats"
+          [weddingDate]="info()?.date ?? null"
+          [location]="info()?.location || 'Agadir, Maroc'"
+        ></app-qr-code>
+      }
+
       @for (reservation of reservations(); track reservation.id) {
         @if (reservation.status === 'pending') {
           <div class="bg-[var(--color-surface)] border border-[var(--color-gold)]/30 rounded-2xl p-4">
@@ -102,54 +112,36 @@
             </div>
           </div>
         } @else {
-          <div class="relative bg-[var(--color-surface)] border border-[var(--color-gold)]/30 rounded-2xl p-4 text-center animate-ticket-in overflow-hidden">
-            <div class="pointer-events-none absolute -inset-1 rounded-2xl border border-[var(--color-gold)]/20 animate-glow-pulse"></div>
-            <div class="text-xs text-[var(--color-gold)] flex items-center justify-center gap-1.5 mb-2 animate-heart-pulse"><app-icon name="sparkle" class="w-3 h-3" /> VOTRE PLACE</div>
-            <p class="font-display text-lg text-[var(--color-text)]">{{ reservation.table.name }}</p>
-            <p class="text-xs text-[var(--color-text-muted)] mb-3">{{ reservation.table.description }}</p>
-            <p class="font-display text-2xl text-[var(--color-gold-bright)] mb-2">Place #{{ reservation.seatNumber }}</p>
-
-            @if (editingCompanionId() === reservation.id) {
-              <div class="flex gap-2 mb-4 justify-center">
-                <input
-                  [(ngModel)]="companionNameInput"
-                  name="companionNameValidated-{{ reservation.id }}"
-                  placeholder="Nom de la personne (obligatoire)"
-                  class="flex-1 max-w-[220px] bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
-                />
-                <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion() || !companionNameInput.trim()" class="w-6 h-6 p-1 text-[var(--color-success)] disabled:opacity-40"><app-icon name="check" /></button>
-                <button (click)="editingCompanionId.set(null)" class="w-6 h-6 p-1 text-[var(--color-text-muted)]"><app-icon name="close" /></button>
-              </div>
-            } @else {
-              <button (click)="startEditCompanion(reservation)" class="text-xs text-[var(--color-text-muted)] mb-4 underline decoration-dotted">
-                @if (reservation.companionName) {
-                  Pour : {{ reservation.companionName }}
+          <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-[var(--color-text)]">{{ reservation.table.name }} · Place #{{ reservation.seatNumber }}</p>
+                @if (editingCompanionId() === reservation.id) {
+                  <div class="flex gap-2 mt-1.5">
+                    <input
+                      [(ngModel)]="companionNameInput"
+                      name="companionNameValidated-{{ reservation.id }}"
+                      placeholder="Nom de la personne (obligatoire)"
+                      class="flex-1 max-w-[200px] bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
+                    />
+                    <button (click)="saveCompanionName(reservation)" [disabled]="savingCompanion() || !companionNameInput.trim()" class="w-6 h-6 p-1 text-[var(--color-success)] disabled:opacity-40"><app-icon name="check" /></button>
+                    <button (click)="editingCompanionId.set(null)" class="w-6 h-6 p-1 text-[var(--color-text-muted)]"><app-icon name="close" /></button>
+                  </div>
                 } @else {
-                  <app-icon name="warning" class="w-3 h-3 inline-block align-[-1px]" /> Préciser pour qui (obligatoire)
+                  <button (click)="startEditCompanion(reservation)" class="text-xs text-[var(--color-text-muted)] mt-0.5 underline decoration-dotted">
+                    @if (reservation.companionName) {
+                      Pour : {{ reservation.companionName }}
+                    } @else {
+                      <app-icon name="warning" class="w-3 h-3 inline-block align-[-1px]" /> Préciser pour qui (obligatoire)
+                    }
+                  </button>
                 }
-              </button>
-            }
-
-            @if (tickets()[reservation.id]; as t) {
-              <app-qr-code
-                [dataUrl]="t.qrDataUrl"
-                [tableName]="reservation.table.name"
-                [seatNumber]="reservation.seatNumber"
-                [weddingDate]="info()?.date ?? null"
-                [location]="info()?.location || 'Agadir, Maroc'"
-              ></app-qr-code>
-            }
-
-            @if (reservation.tableMates.length) {
-              <div class="text-left mt-4 border-t border-[var(--color-border)] pt-3">
-                <p class="text-xs text-[var(--color-text-muted)] mb-1">VOTRE TABLE</p>
-                <p class="text-sm text-[var(--color-text-soft)]">{{ reservation.tableMates.join(', ') }}</p>
+                @if (reservation.tableMates.length) {
+                  <p class="text-xs text-[var(--color-text-muted)] mt-1.5">Table : {{ reservation.tableMates.join(', ') }}</p>
+                }
               </div>
-            }
-
-            <button (click)="cancelling.set(reservation)" class="mt-4 text-xs text-[var(--color-error)] inline-flex items-center gap-1">
-              <app-icon name="close" class="w-3 h-3" /> Annuler cette place
-            </button>
+              <button (click)="cancelling.set(reservation)" class="text-xs text-[var(--color-error)] whitespace-nowrap shrink-0">Annuler</button>
+            </div>
           </div>
         }
       }

@@ -2,14 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MyReservation } from '../models/reservation.model';
+import { GroupTicket, MyReservation } from '../models/reservation.model';
 
 interface MyReservationsResponse {
   data: { reservations: MyReservation[]; groupSize: number };
-}
-
-interface TicketResponse {
-  data: { qrDataUrl: string; tableName: string; seatNumber: number };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -48,9 +44,9 @@ export class ReservationService {
     return res.data.reservation;
   }
 
-  async ticket(reservationId: string): Promise<TicketResponse['data']> {
+  async myTicket(): Promise<GroupTicket> {
     const res = await firstValueFrom(
-      this.http.get<TicketResponse>(`${environment.apiUrl}/reservations/${reservationId}/ticket`)
+      this.http.get<{ data: GroupTicket }>(`${environment.apiUrl}/reservations/ticket`)
     );
     return res.data;
   }

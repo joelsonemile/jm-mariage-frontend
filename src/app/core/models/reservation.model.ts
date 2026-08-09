@@ -9,6 +9,18 @@ export interface MyReservation {
   tableMates: string[];
 }
 
+export interface TicketSeat {
+  tableName: string;
+  seatNumber: number;
+  companionName: string;
+}
+
+export interface GroupTicket {
+  qrDataUrl: string;
+  guestName: string;
+  seats: TicketSeat[];
+}
+
 export interface AdminReservation {
   _id: string;
   seatNumber: number;

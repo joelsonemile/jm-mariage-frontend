@@ -7,19 +7,13 @@ import { ReservationService } from '../../../core/services/reservation.service';
 import { GuestService } from '../../../core/services/guest.service';
 import { WeddingInfoService } from '../../../core/services/wedding-info.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { MyReservation } from '../../../core/models/reservation.model';
+import { GroupTicket, MyReservation } from '../../../core/models/reservation.model';
 import { WeddingInfo } from '../../../core/models/wedding-info.model';
 import { RsvpStatus } from '../../../core/models/user.model';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { QrCodeComponent } from '../../../shared/components/qr-code/qr-code';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { IconComponent } from '../../../shared/components/icon/icon';
-
-interface Ticket {
-  qrDataUrl: string;
-  tableName: string;
-  seatNumber: number;
-}
 
 @Component({
   selector: 'app-guest-dashboard',
@@ -32,7 +26,9 @@ export class GuestDashboardComponent implements OnInit {
 
   readonly reservations = signal<MyReservation[]>([]);
   readonly info = signal<WeddingInfo | null>(null);
-  readonly tickets = signal<Record<string, Ticket>>({});
+  // Un seul ticket regroupant toutes les places validées du compte, plutôt
+  // qu'un ticket répété par réservation.
+  readonly groupTicket = signal<GroupTicket | null>(null);
   readonly cancelling = signal<MyReservation | null>(null);
   readonly loading = signal(true);
 
@@ -67,11 +63,8 @@ export class GuestDashboardComponent implements OnInit {
     this.reservations.set(reservations);
     this.info.set(info);
 
-    const validated = reservations.filter((r) => r.status === 'validated');
-    const entries = await Promise.all(
-      validated.map(async (r) => [r.id, await this.reservationService.ticket(r.id)] as const)
-    );
-    this.tickets.set(Object.fromEntries(entries));
+    const hasValidated = reservations.some((r) => r.status === 'validated');
+    this.groupTicket.set(hasValidated ? await this.reservationService.myTicket() : null);
 
     const user = this.auth.user();
     if (user && user.groupSize !== groupSize) {
