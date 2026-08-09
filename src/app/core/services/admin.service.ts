@@ -102,6 +102,13 @@ export class AdminService {
     await firstValueFrom(this.http.delete(`${this.base}/invited-guests/${id}`));
   }
 
+  async markInvitationSent(id: string, sent: boolean): Promise<InvitedGuest> {
+    const res = await firstValueFrom(
+      this.http.put<{ data: { invitedGuest: InvitedGuest } }>(`${this.base}/invited-guests/${id}/invitation-sent`, { sent })
+    );
+    return res.data.invitedGuest;
+  }
+
   async exportInvitedGuestsPdf(): Promise<Blob> {
     return firstValueFrom(this.http.get(`${this.base}/invited-guests/pdf`, { responseType: 'blob' }));
   }

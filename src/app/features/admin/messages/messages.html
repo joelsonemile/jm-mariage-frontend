@@ -5,6 +5,31 @@
   </p>
 
   @if (!loading()) {
+    <!-- Statistiques globales -->
+    <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4 mb-4">
+      <p class="text-[10px] tracking-widest text-[var(--color-text-muted)] mb-3">STATISTIQUES D'ENVOI</p>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div>
+          <p class="font-display text-xl text-[var(--color-text)]">{{ globalStats().total }}</p>
+          <p class="text-[10px] text-[var(--color-text-muted)]">Invités</p>
+        </div>
+        <div>
+          <p class="font-display text-xl text-[var(--color-success)]">{{ globalStats().sent }}</p>
+          <p class="text-[10px] text-[var(--color-text-muted)]">Déjà envoyé</p>
+        </div>
+        <div>
+          <p class="font-display text-xl text-[var(--color-gold-bright)]">{{ globalStats().unsent }}</p>
+          <p class="text-[10px] text-[var(--color-text-muted)]">Pas encore envoyé</p>
+        </div>
+      </div>
+      <div class="mt-3 h-1.5 rounded-full bg-[var(--color-bg-secondary)] overflow-hidden">
+        <div
+          class="h-full bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-gold-bright)]"
+          [style.width.%]="globalStats().total ? (globalStats().sent / globalStats().total) * 100 : 0"
+        ></div>
+      </div>
+    </div>
+
     <!-- Destinataires -->
     <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4 mb-4">
       <p class="text-[10px] tracking-widest text-[var(--color-text-muted)] mb-2">DESTINATAIRES</p>
@@ -117,42 +142,84 @@
 
     <!-- Envoi -->
     <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4">
-      <div class="flex items-center justify-between mb-2">
-        <p class="text-[10px] tracking-widest text-[var(--color-text-muted)]">
-          ENVOI ({{ reachableCount() }}/{{ recipients().length }} joignables)
-        </p>
-        @if (sentIds().size > 0) {
-          <button type="button" (click)="resetSent()" class="text-xs text-[var(--color-text-muted)]">
-            Réinitialiser le suivi
-          </button>
-        }
+      <p class="text-[10px] tracking-widest text-[var(--color-text-muted)] mb-2">
+        ENVOI ({{ reachableCount() }}/{{ recipients().length }} joignables · {{ selectionSentCount() }} déjà envoyés)
+      </p>
+
+      <div class="flex gap-2 mb-3">
+        <button
+          type="button"
+          (click)="sentFilter.set('all')"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="sentFilter() === 'all'
+            ? 'bg-[var(--color-text)] text-[var(--color-bg)] font-semibold'
+            : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          Tous ({{ recipients().length }})
+        </button>
+        <button
+          type="button"
+          (click)="sentFilter.set('unsent')"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="sentFilter() === 'unsent'
+            ? 'bg-[var(--color-text)] text-[var(--color-bg)] font-semibold'
+            : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          Non envoyés ({{ recipients().length - selectionSentCount() }})
+        </button>
+        <button
+          type="button"
+          (click)="sentFilter.set('sent')"
+          class="text-xs rounded-full px-3.5 py-1.5 whitespace-nowrap transition-colors"
+          [class]="sentFilter() === 'sent'
+            ? 'bg-[var(--color-text)] text-[var(--color-bg)] font-semibold'
+            : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+        >
+          Envoyés ({{ selectionSentCount() }})
+        </button>
       </div>
 
       @if (!recipients().length) {
         <p class="text-sm text-[var(--color-text-muted)] italic py-6 text-center">Aucun destinataire sélectionné.</p>
+      } @else if (!displayedRecipients().length) {
+        <p class="text-sm text-[var(--color-text-muted)] italic py-6 text-center">Aucun invité dans ce filtre.</p>
       } @else {
         <div class="flex flex-col gap-2">
-          @for (g of recipients(); track g._id) {
+          @for (g of displayedRecipients(); track g._id) {
             <div class="flex items-center justify-between gap-3 bg-[var(--color-bg-secondary)] rounded-xl p-3">
               <div class="min-w-0">
                 <p class="text-sm font-medium text-[var(--color-text)] truncate">{{ g.nom }} {{ g.prenom }}</p>
-                <p class="text-xs text-[var(--color-text-muted)]">{{ g.telephone || 'Pas de numéro' }}</p>
+                @if (g.invitationSentAt) {
+                  <p class="text-xs text-[var(--color-success)]">Envoyé le {{ formatSentDate(g.invitationSentAt) }}</p>
+                } @else {
+                  <p class="text-xs text-[var(--color-text-muted)]">{{ g.telephone || 'Pas de numéro' }}</p>
+                }
               </div>
               @if (hasValidPhone(g)) {
-                <button
-                  type="button"
-                  (click)="openWhatsApp(g)"
-                  class="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3.5 py-2 transition-colors"
-                  [class]="sentIds().has(g._id)
-                    ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
-                    : 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black'"
-                >
-                  @if (sentIds().has(g._id)) {
-                    <app-icon name="check" class="w-3.5 h-3.5" /> Envoyé
-                  } @else {
+                @if (g.invitationSentAt) {
+                  <div class="shrink-0 flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold rounded-full px-3 py-2 bg-[var(--color-success)]/15 text-[var(--color-success)]">
+                      <app-icon name="check" class="w-3.5 h-3.5" /> Envoyé
+                    </span>
+                    <button
+                      type="button"
+                      (click)="setSent(g, false)"
+                      [disabled]="togglingId() === g._id"
+                      class="text-[10px] text-[var(--color-text-muted)] underline disabled:opacity-50"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="openWhatsApp(g)"
+                    [disabled]="togglingId() === g._id"
+                    class="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3.5 py-2 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black disabled:opacity-60"
+                  >
                     <app-icon name="message" class="w-3.5 h-3.5" /> WhatsApp
-                  }
-                </button>
+                  </button>
+                }
               } @else {
                 <span class="shrink-0 text-[10px] text-[var(--color-error)]">Numéro invalide</span>
               }

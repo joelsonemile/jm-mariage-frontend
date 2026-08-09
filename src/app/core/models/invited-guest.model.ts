@@ -5,4 +5,5 @@ export interface InvitedGuest {
   telephone: string;
   categorie: string;
   nombreAccompagnants: number;
+  invitationSentAt: string | null;
 }

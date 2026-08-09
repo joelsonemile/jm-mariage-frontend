@@ -2,6 +2,7 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { InvitedGuest } from '../../../core/models/invited-guest.model';
 import { Category } from '../../../core/models/category.model';
 import { IconComponent } from '../../../shared/components/icon/icon';
@@ -12,6 +13,7 @@ const DEFAULT_MESSAGE =
   "Bonjour {{prenom}},\n\nNous avons le plaisir de vous inviter au mariage de Joelson & Marjorie ! Merci de confirmer votre présence et de réserver votre place via le lien ci-dessous.";
 
 type SelectionMode = 'individual' | 'category' | 'all';
+type SentFilter = 'all' | 'sent' | 'unsent';
 
 @Component({
   selector: 'app-admin-messages',
@@ -31,9 +33,10 @@ export class AdminMessagesComponent implements OnInit {
   readonly selectedIds = signal<Set<string>>(new Set());
   readonly selectedCategory = signal('');
   readonly messageBody = signal(DEFAULT_MESSAGE);
-  readonly sentIds = signal<Set<string>>(new Set());
+  readonly sentFilter = signal<SentFilter>('all');
+  readonly togglingId = signal<string | null>(null);
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService, private toast: ToastService) {}
 
   async ngOnInit(): Promise<void> {
     const [invitedGuests, categories] = await Promise.all([
@@ -65,6 +68,14 @@ export class AdminMessagesComponent implements OnInit {
     return counts;
   });
 
+  // Statistiques globales, indépendantes de la sélection en cours : donnent une
+  // vue d'ensemble de la campagne d'envoi sur l'ensemble des invités attendus.
+  readonly globalStats = computed(() => {
+    const guests = this.invitedGuests();
+    const sent = guests.filter((g) => !!g.invitationSentAt).length;
+    return { total: guests.length, sent, unsent: guests.length - sent };
+  });
+
   readonly recipients = computed<InvitedGuest[]>(() => {
     const mode = this.mode();
     if (mode === 'all') return this.invitedGuests();
@@ -79,6 +90,17 @@ export class AdminMessagesComponent implements OnInit {
   readonly reachableCount = computed(
     () => this.recipients().filter((g) => !!toWhatsAppNumber(g.telephone)).length
   );
+
+  readonly selectionSentCount = computed(
+    () => this.recipients().filter((g) => !!g.invitationSentAt).length
+  );
+
+  readonly displayedRecipients = computed(() => {
+    const filter = this.sentFilter();
+    if (filter === 'sent') return this.recipients().filter((g) => !!g.invitationSentAt);
+    if (filter === 'unsent') return this.recipients().filter((g) => !g.invitationSentAt);
+    return this.recipients();
+  });
 
   readonly previewMessage = computed(() => {
     const sample = this.recipients()[0];
@@ -101,23 +123,42 @@ export class AdminMessagesComponent implements OnInit {
     return !!toWhatsAppNumber(guest.telephone);
   }
 
+  formatSentDate(iso: string): string {
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm} à ${hh}h${min}`;
+  }
+
   private buildMessageFor(guest: InvitedGuest): string {
     const firstName = guest.prenom || guest.nom || 'cher invité';
     const body = this.messageBody().replaceAll('{{prenom}}', firstName);
     return `${body}\n\n${INVITATION_LINK}`;
   }
 
-  openWhatsApp(guest: InvitedGuest): void {
+  private updateGuestLocally(updated: InvitedGuest): void {
+    this.invitedGuests.set(this.invitedGuests().map((g) => (g._id === updated._id ? updated : g)));
+  }
+
+  async openWhatsApp(guest: InvitedGuest): Promise<void> {
     const phone = toWhatsAppNumber(guest.telephone);
     if (!phone) return;
     const text = encodeURIComponent(this.buildMessageFor(guest));
     window.open(`https://wa.me/${phone}?text=${text}`, '_blank', 'noopener');
-    const next = new Set(this.sentIds());
-    next.add(guest._id);
-    this.sentIds.set(next);
+    await this.setSent(guest, true);
   }
 
-  resetSent(): void {
-    this.sentIds.set(new Set());
+  async setSent(guest: InvitedGuest, sent: boolean): Promise<void> {
+    this.togglingId.set(guest._id);
+    try {
+      const updated = await this.adminService.markInvitationSent(guest._id, sent);
+      this.updateGuestLocally(updated);
+    } catch {
+      this.toast.show("Impossible de mettre à jour le statut d'envoi.", 'error');
+    } finally {
+      this.togglingId.set(null);
+    }
   }
 }
