@@ -3,6 +3,7 @@ export interface TableSummary {
   name: string;
   description: string;
   isHonorTable: boolean;
+  adminOnly: boolean;
   totalSeats: number;
   order: number;
   reservedCount: number;
@@ -16,6 +17,7 @@ export interface Seat {
   seatNumber: number;
   status: SeatStatus;
   guestFirstName?: string | null;
+  guestFullName?: string | null;
 }
 
 export interface TableDetail {
@@ -24,6 +26,7 @@ export interface TableDetail {
     name: string;
     description: string;
     isHonorTable: boolean;
+    adminOnly: boolean;
     totalSeats: number;
   };
   seats: Seat[];

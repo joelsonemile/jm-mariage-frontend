@@ -89,6 +89,17 @@
             @if (g.telephone) {
               <p class="text-xs text-[var(--color-text-muted)]">{{ g.telephone }}</p>
             }
+            <button
+              type="button"
+              (click)="toggleSent(g)"
+              [disabled]="togglingSentId() === g._id"
+              class="mt-1.5 inline-flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 disabled:opacity-50"
+              [class]="g.invitationSentAt
+                ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
+                : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+            >
+              @if (g.invitationSentAt) { <app-icon name="check" class="w-2.5 h-2.5" /> Invitation envoyée } @else { Invitation non envoyée }
+            </button>
           </div>
           <div class="flex items-center gap-2 shrink-0">
             <button (click)="openEdit(g)" class="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center p-2"><app-icon name="edit" /></button>

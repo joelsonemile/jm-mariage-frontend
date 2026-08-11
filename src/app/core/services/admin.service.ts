@@ -51,6 +51,17 @@ export class AdminService {
     await firstValueFrom(this.http.put(`${this.base}/reservations/${id}/move`, { tableId, seatNumber }));
   }
 
+  async assignInvitedGuestToSeat(invitedGuestId: string, tableId: string, seatNumber: number): Promise<AdminReservation> {
+    const res = await firstValueFrom(
+      this.http.post<{ data: { reservation: AdminReservation } }>(`${this.base}/reservations/assign-invited-guest`, {
+        invitedGuestId,
+        tableId,
+        seatNumber,
+      })
+    );
+    return res.data.reservation;
+  }
+
   async listGuests(search = ''): Promise<AdminGuest[]> {
     const url = search ? `${this.base}/guests?search=${encodeURIComponent(search)}` : `${this.base}/guests`;
     const res = await firstValueFrom(this.http.get<{ data: { guests: AdminGuest[] } }>(url));

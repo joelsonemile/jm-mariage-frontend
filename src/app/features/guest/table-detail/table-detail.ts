@@ -25,6 +25,7 @@ export class TableDetailComponent implements OnInit, OnDestroy {
   readonly showConfirm = signal(false);
   readonly showPendingInfo = signal(false);
   readonly submitting = signal(false);
+  readonly revealedSeat = signal<number | null>(null);
   companionName = '';
   private unsubscribe: (() => void) | null = null;
 
@@ -51,6 +52,12 @@ export class TableDetailComponent implements OnInit, OnDestroy {
 
   async load(): Promise<void> {
     this.detail.set(await this.tableService.get(this.tableId));
+  }
+
+  // Le badge n'affiche que le prénom par défaut ; un clic révèle le nom complet
+  // (nouveau clic ou clic sur un autre badge pour le masquer à nouveau).
+  toggleReveal(seatNumber: number): void {
+    this.revealedSeat.set(this.revealedSeat() === seatNumber ? null : seatNumber);
   }
 
   pickSeat(seatNumber: number): void {

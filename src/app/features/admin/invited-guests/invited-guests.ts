@@ -40,6 +40,7 @@ export class AdminInvitedGuestsComponent implements OnInit {
   readonly deleting = signal<InvitedGuest | null>(null);
 
   readonly downloadingPdf = signal(false);
+  readonly togglingSentId = signal<string | null>(null);
 
   readonly showManageCategories = signal(false);
   readonly newCategoryName = signal('');
@@ -147,6 +148,16 @@ export class AdminInvitedGuestsComponent implements OnInit {
     this.toast.show('Invité attendu supprimé.', 'success');
     this.deleting.set(null);
     await this.load();
+  }
+
+  async toggleSent(guest: InvitedGuest): Promise<void> {
+    this.togglingSentId.set(guest._id);
+    try {
+      const updated = await this.adminService.markInvitationSent(guest._id, !guest.invitationSentAt);
+      this.invitedGuests.set(this.invitedGuests().map((g) => (g._id === updated._id ? updated : g)));
+    } finally {
+      this.togglingSentId.set(null);
+    }
   }
 
   async downloadPdf(): Promise<void> {

@@ -35,10 +35,20 @@
     <p class="text-[11px] text-[var(--color-text-muted)] mb-2">{{ filteredTables().length }} table(s)</p>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       @for (t of filteredTables(); track t.id) {
-        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4">
-          <div class="flex items-center justify-between mb-2">
-            <p class="font-display text-[var(--color-text)]">{{ t.name }}</p>
-            <p class="text-xs text-[var(--color-text-muted)]">{{ t.reservedCount }}/{{ t.totalSeats }}</p>
+        <div
+          class="bg-[var(--color-surface)] rounded-xl p-4"
+          [class]="t.adminOnly ? 'border border-[var(--color-gold)]/40' : 'border border-[var(--color-border)]'"
+        >
+          <div class="flex items-center justify-between mb-2 gap-2">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <p class="font-display text-[var(--color-text)]">{{ t.name }}</p>
+              @if (t.adminOnly) {
+                <span class="text-[9px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)] whitespace-nowrap">
+                  Admin uniquement
+                </span>
+              }
+            </div>
+            <p class="text-xs text-[var(--color-text-muted)] whitespace-nowrap">{{ t.reservedCount }}/{{ t.totalSeats }}</p>
           </div>
 
           @if (!t.guests.length) {
@@ -46,20 +56,72 @@
           } @else {
             <div class="flex flex-col gap-1.5">
               @for (g of t.guests; track g._id) {
-                <div class="flex items-center justify-between text-xs">
-                  <span class="text-[var(--color-text-soft)]">
-                    #{{ g.seatNumber }} {{ g.companionName || g.guest.fullName }}
-                    @if (g.companionName) { <span class="text-[var(--color-text-muted)]">(cpt. {{ g.guest.fullName }})</span> }
-                  </span>
-                  <span
-                    class="rounded-full px-2 py-0.5"
-                    [class]="g.status === 'validated' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' : 'bg-[var(--color-gold)]/20 text-[var(--color-gold)]'"
-                  >
-                    {{ g.status === 'validated' ? 'Validée' : 'En attente' }}
-                  </span>
+                <div class="flex flex-col gap-1.5 text-xs">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[var(--color-text-soft)]">
+                      #{{ g.seatNumber }} {{ g.companionName || g.guest.fullName }}
+                      @if (g.companionName) { <span class="text-[var(--color-text-muted)]">(cpt. {{ g.guest.fullName }})</span> }
+                    </span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <span
+                        class="rounded-full px-2 py-0.5"
+                        [class]="g.status === 'validated' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' : 'bg-[var(--color-gold)]/20 text-[var(--color-gold)]'"
+                      >
+                        {{ g.status === 'validated' ? 'Validée' : 'En attente' }}
+                      </span>
+                      <button
+                        type="button"
+                        (click)="startMove(g)"
+                        class="w-6 h-6 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-soft)] flex items-center justify-center p-1"
+                      >
+                        <app-icon name="edit" />
+                      </button>
+                    </div>
+                  </div>
+
+                  @if (movingReservationId() === g._id) {
+                    <div class="flex items-center gap-1.5 bg-[var(--color-bg-secondary)] rounded-lg p-2">
+                      <select
+                        [(ngModel)]="moveDraft.tableId"
+                        name="moveTable-{{ g._id }}"
+                        class="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
+                      >
+                        @for (opt of tables(); track opt.id) {
+                          <option [value]="opt.id">{{ opt.name }}</option>
+                        }
+                      </select>
+                      <input
+                        type="number"
+                        min="1"
+                        [(ngModel)]="moveDraft.seatNumber"
+                        name="moveSeat-{{ g._id }}"
+                        class="w-14 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1.5 text-xs text-[var(--color-text-soft)] outline-none"
+                      />
+                      <button type="button" (click)="cancelMove()" class="w-6 h-6 shrink-0 text-[var(--color-text-muted)]"><app-icon name="close" /></button>
+                      <button
+                        type="button"
+                        (click)="confirmMove(g._id)"
+                        [disabled]="moving()"
+                        class="w-6 h-6 shrink-0 text-[var(--color-success)] disabled:opacity-50"
+                      >
+                        <app-icon name="check" />
+                      </button>
+                    </div>
+                  }
                 </div>
               }
             </div>
+          }
+
+          @if (t.adminOnly) {
+            <button
+              type="button"
+              (click)="openAssign(t)"
+              [disabled]="t.reservedCount >= t.totalSeats"
+              class="mt-3 w-full text-xs rounded-full py-2 border border-[var(--color-gold)]/40 text-[var(--color-gold)] disabled:opacity-40"
+            >
+              + Affecter un invité attendu
+            </button>
           }
         </div>
       }
@@ -69,3 +131,50 @@
     }
   }
 </div>
+
+<app-modal [open]="!!assigningTable()" heading="Affecter un invité attendu" (closed)="closeAssign()">
+  @if (assigningTable(); as table) {
+    <div class="flex flex-col gap-4">
+      <div>
+        <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">TABLE</label>
+        <p class="text-sm text-[var(--color-text)]">{{ table.name }}</p>
+      </div>
+      <div>
+        <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">PLACE</label>
+        <select
+          [(ngModel)]="assignSeatNumber"
+          name="assignSeat"
+          class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--color-text-soft)] outline-none"
+        >
+          @for (n of freeSeatNumbers(table); track n) {
+            <option [value]="n">Place #{{ n }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">INVITÉ ATTENDU</label>
+        <input
+          [(ngModel)]="assignSearch"
+          name="assignSearch"
+          placeholder="Rechercher un nom..."
+          class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-full px-4 py-2.5 text-sm text-[var(--color-text-soft)] mb-2 outline-none"
+        />
+        <div class="max-h-60 overflow-y-auto flex flex-col gap-1 border border-[var(--color-border)] rounded-xl p-1.5">
+          @for (g of filteredForAssign(); track g._id) {
+            <button
+              type="button"
+              (click)="assignGuest(g)"
+              [disabled]="assigning()"
+              class="flex items-center justify-between text-left text-sm px-2.5 py-2 rounded-lg text-[var(--color-text)] hover:bg-[var(--color-bg-secondary)] disabled:opacity-50"
+            >
+              <span>{{ g.nom }} {{ g.prenom }}</span>
+              <span class="text-xs text-[var(--color-text-muted)]">{{ g.categorie }}</span>
+            </button>
+          } @empty {
+            <p class="text-xs text-[var(--color-text-muted)] py-3 text-center">Aucun invité trouvé.</p>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</app-modal>

@@ -25,12 +25,14 @@
           <app-seat-circle [seat]="seat" [selected]="selectedSeat() === seat.seatNumber" (picked)="pickSeat($event)"></app-seat-circle>
         </div>
         @if (seat.status === 'taken' && seat.guestFirstName) {
-          <div
+          <button
+            type="button"
+            (click)="toggleReveal(seat.seatNumber)"
             [style]="labelStyle(i, detail()!.seats.length)"
-            class="max-w-[64px] truncate text-[9px] leading-none rounded-full px-1.5 py-1 bg-[var(--color-gold)]/15 text-[var(--color-gold)] border border-[var(--color-gold)]/30"
+            [class]="(revealedSeat() === seat.seatNumber ? 'max-w-[120px]' : 'max-w-[64px]') + ' truncate text-[9px] leading-none rounded-full px-1.5 py-1 bg-[var(--color-gold)]/15 text-[var(--color-gold)] border border-[var(--color-gold)]/30'"
           >
-            {{ seat.guestFirstName }}
-          </div>
+            {{ revealedSeat() === seat.seatNumber ? seat.guestFullName : seat.guestFirstName }}
+          </button>
         }
       }
     </div>
