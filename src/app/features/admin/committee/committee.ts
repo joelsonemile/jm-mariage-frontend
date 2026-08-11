@@ -129,6 +129,14 @@ export class AdminCommitteeComponent implements OnInit {
     this.commissionFilter.set('all');
   }
 
+  isResponsable(commission: Commission, committeeMemberId: string): boolean {
+    return commission.responsables.some((r) => r._id === committeeMemberId);
+  }
+
+  responsableNames(commission: Commission): string {
+    return commission.responsables.map((r) => r.nom).join(', ');
+  }
+
   toggleExpanded(commissionId: string): void {
     this.expandedCommissionId.set(this.expandedCommissionId() === commissionId ? null : commissionId);
   }
@@ -138,11 +146,15 @@ export class AdminCommitteeComponent implements OnInit {
     this.showCreate.set(true);
   }
 
-  async setResponsable(commission: Commission, committeeMemberId: string): Promise<void> {
+  async toggleResponsable(commission: Commission, committeeMemberId: string): Promise<void> {
+    const current = commission.responsables.map((r) => r._id);
+    const adding = !current.includes(committeeMemberId);
+    const next = adding ? [...current, committeeMemberId] : current.filter((id) => id !== committeeMemberId);
+
     this.settingResponsableFor.set(commission._id);
     try {
-      await this.adminService.setCommissionResponsable(commission._id, committeeMemberId || null);
-      this.toast.show(committeeMemberId ? 'Responsable désigné.' : 'Responsable retiré.', 'success');
+      await this.adminService.setCommissionResponsables(commission._id, next);
+      this.toast.show(adding ? 'Responsable ajouté.' : 'Responsable retiré.', 'success');
       await this.loadCommissions();
     } finally {
       this.settingResponsableFor.set(null);

@@ -98,9 +98,9 @@
             <div class="flex items-start justify-between gap-3">
               <div>
                 <p class="font-display text-[var(--color-gold)]">{{ group.commission.nom }}</p>
-                @if (group.commission.responsable) {
+                @if (group.commission.responsables.length) {
                   <p class="text-sm text-[var(--color-text)] mt-1">
-                    Responsable : <strong>{{ group.commission.responsable.nom }}</strong>
+                    Responsable(s) : <strong>{{ responsableNames(group.commission) }}</strong>
                   </p>
                 } @else {
                   <p class="text-xs text-[var(--color-text-muted)] italic mt-1">Aucun responsable désigné</p>
@@ -113,18 +113,23 @@
 
             @if (group.members.length) {
               <div class="mt-3">
-                <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">DÉSIGNER LE RESPONSABLE</label>
-                <select
-                  [ngModel]="group.commission.responsable?._id || ''"
-                  (ngModelChange)="setResponsable(group.commission, $event)"
-                  [disabled]="settingResponsableFor() === group.commission._id"
-                  class="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-soft)] outline-none"
-                >
-                  <option value="">— Aucun —</option>
+                <label class="block text-[10px] tracking-widest text-[var(--color-text-muted)] mb-1.5">DÉSIGNER LE(S) RESPONSABLE(S)</label>
+                <div class="flex flex-wrap gap-1.5">
                   @for (m of group.members; track m._id) {
-                    <option [value]="m._id">{{ m.nom }}</option>
+                    <button
+                      type="button"
+                      (click)="toggleResponsable(group.commission, m._id)"
+                      [disabled]="settingResponsableFor() === group.commission._id"
+                      class="text-xs rounded-full px-3 py-1.5 whitespace-nowrap transition-colors disabled:opacity-50"
+                      [class]="isResponsable(group.commission, m._id)
+                        ? 'bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black font-semibold'
+                        : 'bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-muted)]'"
+                    >
+                      @if (isResponsable(group.commission, m._id)) { <app-icon name="check" class="w-2.5 h-2.5 inline-block align-[-1px]" /> }
+                      {{ m.nom }}
+                    </button>
                   }
-                </select>
+                </div>
               </div>
             }
 
@@ -142,7 +147,7 @@
                     <div>
                       <p class="text-sm text-[var(--color-text)]">
                         {{ m.nom }}
-                        @if (group.commission.responsable?._id === m._id) {
+                        @if (isResponsable(group.commission, m._id)) {
                           <span class="text-[10px] rounded-full px-2 py-0.5 bg-[var(--color-gold)]/20 text-[var(--color-gold)] ml-1">responsable</span>
                         }
                       </p>

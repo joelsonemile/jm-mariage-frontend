@@ -176,10 +176,10 @@ export class AdminService {
     return firstValueFrom(this.http.get(`${this.base}/committee/pdf`, { responseType: 'blob' }));
   }
 
-  async setCommissionResponsable(commissionId: string, committeeMemberId: string | null): Promise<Commission> {
+  async setCommissionResponsables(commissionId: string, committeeMemberIds: string[]): Promise<Commission> {
     const res = await firstValueFrom(
-      this.http.put<{ data: { commission: Commission } }>(`${this.base}/commissions/${commissionId}/responsable`, {
-        committeeMemberId,
+      this.http.put<{ data: { commission: Commission } }>(`${this.base}/commissions/${commissionId}/responsables`, {
+        committeeMemberIds,
       })
     );
     return res.data.commission;
