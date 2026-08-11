@@ -22,20 +22,30 @@ export class AdminInfosComponent implements OnInit {
   readonly editingStepId = signal<string | null>(null);
   readonly savingStepId = signal<string | null>(null);
   readonly downloadingPdf = signal(false);
-  stepDraft: Partial<ProgramStep> = { time: '', title: '', description: '', section: '' };
+  stepDraft: Partial<ProgramStep> = { time: '', title: '', description: '', section: '', subProgram: '' };
 
-  // Regroupe les étapes par section (Journée / Soirée / ...) dans leur ordre
-  // d'apparition, pour un aperçu admin fidèle à ce que voient les invités.
+  // Regroupe les étapes par section (Journée / Soirée / ...) puis, à l'intérieur
+  // de chaque section, par BLOC CONSÉCUTIF de sous-programme (ex: "PROGRAMME -
+  // DINER DE MARIAGE (20h45 - 22h00)") — les étapes sans sous-programme restent
+  // directement dans la section. Le regroupement par sous-programme se fait par
+  // suite consécutive (pas par fusion globale de la même clé) pour ne pas casser
+  // l'ordre chronologique quand un bloc est inséré entre deux étapes "libres".
   readonly stepGroups = computed(() => {
-    const groups: { section: string; steps: ProgramStep[] }[] = [];
+    const groups: { section: string; subGroups: { subProgram: string; steps: ProgramStep[] }[] }[] = [];
     for (const step of this.steps()) {
-      const key = step.section || '';
-      let group = groups.find((g) => g.section === key);
+      const sectionKey = step.section || '';
+      let group = groups.find((g) => g.section === sectionKey);
       if (!group) {
-        group = { section: key, steps: [] };
+        group = { section: sectionKey, subGroups: [] };
         groups.push(group);
       }
-      group.steps.push(step);
+      const subKey = step.subProgram || '';
+      const lastSubGroup = group.subGroups[group.subGroups.length - 1];
+      if (lastSubGroup && lastSubGroup.subProgram === subKey) {
+        lastSubGroup.steps.push(step);
+      } else {
+        group.subGroups.push({ subProgram: subKey, steps: [step] });
+      }
     }
     return groups;
   });
@@ -62,12 +72,13 @@ export class AdminInfosComponent implements OnInit {
 
   // Chaque étape du programme est persistée immédiatement (CRUD dédié), séparément
   // du bouton "Enregistrer" global qui ne couvre que le reste du formulaire.
-  async addStep(defaultSection = ''): Promise<void> {
+  async addStep(defaultSection = '', defaultSubProgram = ''): Promise<void> {
     const info = await this.weddingInfoService.addProgramStep({
       time: '',
       title: '',
       description: '',
       section: defaultSection,
+      subProgram: defaultSubProgram,
     });
     this.steps.set(info.programDetailed);
     const created = info.programDetailed[info.programDetailed.length - 1];
@@ -76,7 +87,13 @@ export class AdminInfosComponent implements OnInit {
 
   startEdit(step: ProgramStep): void {
     this.editingStepId.set(step._id);
-    this.stepDraft = { time: step.time, title: step.title, description: step.description, section: step.section };
+    this.stepDraft = {
+      time: step.time,
+      title: step.title,
+      description: step.description,
+      section: step.section,
+      subProgram: step.subProgram,
+    };
   }
 
   async saveStep(): Promise<void> {

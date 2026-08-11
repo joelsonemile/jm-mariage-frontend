@@ -5,9 +5,14 @@ import { ProgramStep, WeddingInfo } from '../../../core/models/wedding-info.mode
 import { formatWeddingDateLabel } from '../../../core/utils/date-format.util';
 import { IconComponent } from '../../../shared/components/icon/icon';
 
+interface ProgramSubGroup {
+  subProgram: string;
+  steps: ProgramStep[];
+}
+
 interface ProgramGroup {
   section: string;
-  steps: ProgramStep[];
+  subGroups: ProgramSubGroup[];
 }
 
 @Component({
@@ -20,18 +25,28 @@ export class GuestInfosComponent implements OnInit {
   readonly info = signal<WeddingInfo | null>(null);
   readonly downloadingPdf = signal(false);
 
-  // Regroupe le programme par "acte" (Journée / Soirée / ...) dans leur ordre
-  // d'apparition, pour un affichage en deux temps plutôt qu'une liste plate.
+  // Regroupe le programme par "acte" (Journée / Soirée / ...) puis, à l'intérieur
+  // de chaque acte, par BLOC CONSÉCUTIF de sous-programme (ex: "PROGRAMME - DINER
+  // DE MARIAGE (20h45 - 22h00)") — les étapes sans sous-programme restent
+  // directement dans l'acte. Le regroupement par sous-programme se fait par suite
+  // consécutive (pas par fusion globale de la même clé) pour ne pas casser l'ordre
+  // chronologique quand un bloc est inséré entre deux étapes "libres".
   readonly programGroups = computed<ProgramGroup[]>(() => {
     const groups: ProgramGroup[] = [];
     for (const step of this.info()?.programDetailed || []) {
-      const key = step.section || '';
-      let group = groups.find((g) => g.section === key);
+      const sectionKey = step.section || '';
+      let group = groups.find((g) => g.section === sectionKey);
       if (!group) {
-        group = { section: key, steps: [] };
+        group = { section: sectionKey, subGroups: [] };
         groups.push(group);
       }
-      group.steps.push(step);
+      const subKey = step.subProgram || '';
+      const lastSubGroup = group.subGroups[group.subGroups.length - 1];
+      if (lastSubGroup && lastSubGroup.subProgram === subKey) {
+        lastSubGroup.steps.push(step);
+      } else {
+        group.subGroups.push({ subProgram: subKey, steps: [step] });
+      }
     }
     return groups;
   });

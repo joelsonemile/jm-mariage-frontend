@@ -4,6 +4,7 @@ export interface ProgramStep {
   title: string;
   description: string;
   section: string;
+  subProgram: string;
 }
 
 export interface WeddingInfo {

@@ -77,20 +77,29 @@
                 </div>
               }
 
-              <div class="flex flex-col">
-                @for (step of group.steps; track step._id; let last = $last) {
-                  <div class="flex gap-3">
-                    <div class="flex flex-col items-center">
-                      <span class="w-2.5 h-2.5 rounded-full bg-[var(--color-gold-bright)] shrink-0 mt-1 shadow-[0_0_6px_rgba(255,215,0,0.6)]"></span>
-                      @if (!last) {
-                        <span class="w-px flex-1 bg-[var(--color-gold)]/25 my-0.5"></span>
-                      }
-                    </div>
-                    <div class="pb-4">
-                      <p class="text-xs font-semibold text-[var(--color-gold)]">{{ step.time }}</p>
-                      <p class="text-sm text-[var(--color-text)] font-medium">{{ step.title }}</p>
-                      @if (step.description) {
-                        <p class="text-xs text-[var(--color-text-muted)] mt-0.5 leading-relaxed">{{ step.description }}</p>
+              <div class="flex flex-col gap-4">
+                @for (subGroup of group.subGroups; track subGroup.subProgram) {
+                  <div [class]="subGroup.subProgram ? 'border border-[var(--color-gold)]/20 rounded-xl p-3' : ''">
+                    @if (subGroup.subProgram) {
+                      <p class="text-xs font-semibold text-[var(--color-gold-bright)] mb-2.5">{{ subGroup.subProgram }}</p>
+                    }
+                    <div class="flex flex-col">
+                      @for (step of subGroup.steps; track step._id; let last = $last) {
+                        <div class="flex gap-3">
+                          <div class="flex flex-col items-center">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--color-gold-bright)] shrink-0 mt-1 shadow-[0_0_6px_rgba(255,215,0,0.6)]"></span>
+                            @if (!last) {
+                              <span class="w-px flex-1 bg-[var(--color-gold)]/25 my-0.5"></span>
+                            }
+                          </div>
+                          <div class="pb-4">
+                            <p class="text-xs font-semibold text-[var(--color-gold)]">{{ step.time }}</p>
+                            <p class="text-sm text-[var(--color-text)] font-medium">{{ step.title }}</p>
+                            @if (step.description) {
+                              <p class="text-xs text-[var(--color-text-muted)] mt-0.5 leading-relaxed">{{ step.description }}</p>
+                            }
+                          </div>
+                        </div>
                       }
                     </div>
                   </div>
