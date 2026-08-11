@@ -128,7 +128,7 @@ export class AdminTablesComponent implements OnInit {
       this.movingReservationId.set(null);
       await this.load();
     } catch {
-      this.toast.show('Impossible de déplacer : cette place est peut-être déjà occupée.', 'error');
+      // Message d'erreur précis déjà affiché par l'intercepteur HTTP global.
     } finally {
       this.moving.set(false);
     }
@@ -154,7 +154,8 @@ export class AdminTablesComponent implements OnInit {
       this.assigningTable.set(null);
       await this.load();
     } catch {
-      this.toast.show('Impossible d\'affecter : cette place est peut-être déjà occupée.', 'error');
+      // Le message d'erreur précis (place déjà occupée, invité déjà assigné
+      // ailleurs...) est déjà affiché par l'intercepteur HTTP global.
     } finally {
       this.assigning.set(false);
     }
