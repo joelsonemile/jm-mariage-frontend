@@ -113,16 +113,14 @@
             </div>
           }
 
-          @if (t.adminOnly) {
-            <button
-              type="button"
-              (click)="openAssign(t)"
-              [disabled]="t.reservedCount >= t.totalSeats"
-              class="mt-3 w-full text-xs rounded-full py-2 border border-[var(--color-gold)]/40 text-[var(--color-gold)] disabled:opacity-40"
-            >
-              + Affecter un invité attendu
-            </button>
-          }
+          <button
+            type="button"
+            (click)="openAssign(t)"
+            [disabled]="t.reservedCount >= t.totalSeats"
+            class="mt-3 w-full text-xs rounded-full py-2 border border-[var(--color-gold)]/40 text-[var(--color-gold)] disabled:opacity-40"
+          >
+            + Affecter un invité attendu
+          </button>
         </div>
       }
     </div>
