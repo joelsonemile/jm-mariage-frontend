@@ -29,6 +29,10 @@ export class AdminService {
     return res.data.stats;
   }
 
+  async exportTablesPdf(): Promise<Blob> {
+    return firstValueFrom(this.http.get(`${this.base}/tables/pdf`, { responseType: 'blob' }));
+  }
+
   async listReservations(status?: ReservationStatus): Promise<AdminReservation[]> {
     const url = status ? `${this.base}/reservations?status=${status}` : `${this.base}/reservations`;
     const res = await firstValueFrom(this.http.get<{ data: { reservations: AdminReservation[] } }>(url));

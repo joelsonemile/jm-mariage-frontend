@@ -26,6 +26,7 @@ export class AdminTablesComponent implements OnInit {
   readonly tables = signal<TableWithGuests[]>([]);
   readonly invitedGuests = signal<InvitedGuest[]>([]);
   readonly loading = signal(true);
+  readonly downloadingPdf = signal(false);
 
   readonly search = signal('');
   readonly occupancyFilter = signal<OccupancyFilter>('all');
@@ -104,6 +105,21 @@ export class AdminTablesComponent implements OnInit {
   resetFilters(): void {
     this.search.set('');
     this.occupancyFilter.set('all');
+  }
+
+  async downloadPdf(): Promise<void> {
+    this.downloadingPdf.set(true);
+    try {
+      const blob = await this.adminService.exportTablesPdf();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'plan-tables-jm-mariage.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      this.downloadingPdf.set(false);
+    }
   }
 
   freeSeatNumbers(table: TableWithGuests): number[] {
