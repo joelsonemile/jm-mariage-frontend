@@ -31,6 +31,7 @@ export class GuestDashboardComponent implements OnInit {
   readonly groupTicket = signal<GroupTicket | null>(null);
   readonly cancelling = signal<MyReservation | null>(null);
   readonly loading = signal(true);
+  readonly loadError = signal(false);
 
   readonly showGroupSizeEditor = signal(false);
   readonly groupSizeInput = signal(1);
@@ -50,25 +51,48 @@ export class GuestDashboardComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.refresh();
-    this.groupSizeInput.set(this.auth.user()?.groupSize || 1);
-    this.loading.set(false);
+    // Un incident réseau ne doit jamais laisser la page bloquée en chargement
+    // indéfiniment (l'invité ne verrait alors ni son ticket ni aucun message).
+    try {
+      await this.refresh();
+    } finally {
+      this.groupSizeInput.set(this.auth.user()?.groupSize || 1);
+      this.loading.set(false);
+    }
   }
 
   async refresh(): Promise<void> {
-    const [{ reservations, groupSize }, info] = await Promise.all([
-      this.reservationService.getMine(),
-      this.weddingInfoService.get(),
-    ]);
-    this.reservations.set(reservations);
-    this.info.set(info);
+    let reservations: MyReservation[];
+    try {
+      const [mine, info] = await Promise.all([this.reservationService.getMine(), this.weddingInfoService.get()]);
+      reservations = mine.reservations;
+      this.reservations.set(reservations);
+      this.info.set(info);
+      this.loadError.set(false);
 
+      const user = this.auth.user();
+      if (user && user.groupSize !== mine.groupSize) {
+        this.auth.updateStoredUser({ ...user, groupSize: mine.groupSize });
+      }
+    } catch {
+      // Une réservation déjà affichée ne doit jamais être remplacée par le
+      // message "aucune place" juste parce que le rechargement a échoué —
+      // on garde le dernier état connu et on propose de réessayer.
+      this.loadError.set(true);
+      return;
+    }
+
+    // Le ticket est un bonus visuel : s'il échoue à se générer, la réservation
+    // (déjà affichée ci-dessus) ne doit pas disparaître pour autant.
     const hasValidated = reservations.some((r) => r.status === 'validated');
-    this.groupTicket.set(hasValidated ? await this.reservationService.myTicket() : null);
-
-    const user = this.auth.user();
-    if (user && user.groupSize !== groupSize) {
-      this.auth.updateStoredUser({ ...user, groupSize });
+    if (!hasValidated) {
+      this.groupTicket.set(null);
+      return;
+    }
+    try {
+      this.groupTicket.set(await this.reservationService.myTicket());
+    } catch {
+      this.groupTicket.set(null);
     }
   }
 

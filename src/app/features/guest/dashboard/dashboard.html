@@ -63,6 +63,16 @@
   </div>
 
   @if (!loading()) {
+    @if (loadError()) {
+      <div class="bg-[var(--color-surface)] border border-[var(--color-error)]/30 rounded-2xl p-6 text-center">
+        <app-icon name="warning" class="w-8 h-8 mx-auto mb-2 text-[var(--color-error)]" />
+        <p class="font-display text-lg text-[var(--color-text)] mb-1">Impossible de charger vos informations</p>
+        <p class="text-xs text-[var(--color-text-muted)] mb-4">Vérifiez votre connexion et réessayez.</p>
+        <button (click)="refresh()" class="text-sm rounded-full px-6 py-3 font-semibold bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black">
+          Réessayer
+        </button>
+      </div>
+    } @else {
     <div class="flex flex-col gap-4">
       @if (groupTicket(); as t) {
         <app-qr-code
@@ -173,6 +183,7 @@
         </a>
       }
     </div>
+    }
   }
 </div>
 
