@@ -36,11 +36,16 @@ export const routes: Routes = [
           import('./features/guest/dashboard/dashboard').then((m) => m.GuestDashboardComponent),
       },
       {
+        // Réservations clôturées : le plan de salle n'est plus consultable que par
+        // l'admin (via "Vue invité"), qui gère désormais tous les placements
+        // manuellement depuis /admin/tables.
         path: 'plan',
+        canActivate: [adminGuard],
         loadComponent: () => import('./features/guest/plan/plan').then((m) => m.GuestPlanComponent),
       },
       {
         path: 'plan/:id',
+        canActivate: [adminGuard],
         loadComponent: () =>
           import('./features/guest/table-detail/table-detail').then((m) => m.TableDetailComponent),
       },

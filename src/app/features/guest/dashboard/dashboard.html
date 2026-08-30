@@ -150,15 +150,21 @@
         <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 text-center">
           <app-icon name="pin" class="w-8 h-8 mx-auto mb-2 text-[var(--color-gold)]" />
           <p class="font-display text-lg text-[var(--color-text)]">Aucune place réservée</p>
-          <p class="text-xs text-[var(--color-text-muted)] mb-4">Choisissez votre table parmi nos 12 tables Malagasy</p>
-          <a
-            routerLink="/guest/plan"
-            class="inline-flex items-center justify-center rounded-full font-semibold text-sm px-6 py-3 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black"
-          >
-            Choisir ma place
-          </a>
+          @if (auth.isAdmin()) {
+            <p class="text-xs text-[var(--color-text-muted)] mb-4">Choisissez votre table parmi nos 12 tables Malagasy</p>
+            <a
+              routerLink="/guest/plan"
+              class="inline-flex items-center justify-center rounded-full font-semibold text-sm px-6 py-3 bg-gradient-to-b from-[var(--color-gold-bright)] to-[var(--color-gold)] text-black"
+            >
+              Choisir ma place
+            </a>
+          } @else {
+            <p class="text-xs text-[var(--color-text-muted)]">
+              Les réservations sont clôturées. L'organisation se charge de votre placement — vous serez prévenu(e) de votre table.
+            </p>
+          }
         </div>
-      } @else if (canReserveMore()) {
+      } @else if (canReserveMore() && auth.isAdmin()) {
         <a
           routerLink="/guest/plan"
           class="text-center text-sm rounded-full py-3 border border-[var(--color-gold)] text-[var(--color-gold)]"
