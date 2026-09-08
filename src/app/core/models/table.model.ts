@@ -28,6 +28,7 @@ export interface TableDetail {
     isHonorTable: boolean;
     adminOnly: boolean;
     totalSeats: number;
+    order: number;
   };
   seats: Seat[];
 }

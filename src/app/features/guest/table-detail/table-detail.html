@@ -2,7 +2,7 @@
   <a routerLink="/guest/plan" class="text-sm text-[var(--color-text-muted)] flex items-center gap-1 mb-4">‹ Plan</a>
 
   @if (detail()) {
-    <h1 class="font-display text-2xl text-[var(--color-gold)]">Table {{ detail()!.table.name }}</h1>
+    <h1 class="font-display text-2xl text-[var(--color-gold)]">N°{{ detail()!.table.order }} · Table {{ detail()!.table.name }}</h1>
     <p class="text-xs text-[var(--color-text-muted)] mb-6">{{ detail()!.table.description }}</p>
 
     <div class="relative w-72 h-72 mx-auto my-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl">
