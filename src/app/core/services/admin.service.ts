@@ -43,6 +43,10 @@ export class AdminService {
     await firstValueFrom(this.http.put(`${this.base}/reservations/${id}/approve`, {}));
   }
 
+  async setReservationStatus(id: string, status: ReservationStatus): Promise<void> {
+    await firstValueFrom(this.http.put(`${this.base}/reservations/${id}/status`, { status }));
+  }
+
   async deleteReservation(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/reservations/${id}`));
   }

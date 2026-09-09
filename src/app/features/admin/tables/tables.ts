@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { TableService } from '../../../core/services/table.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { AdminReservation } from '../../../core/models/reservation.model';
+import { AdminReservation, ReservationStatus } from '../../../core/models/reservation.model';
 import { TableSummary } from '../../../core/models/table.model';
 import { InvitedGuest } from '../../../core/models/invited-guest.model';
 import { IconComponent } from '../../../shared/components/icon/icon';
 import { ModalComponent } from '../../../shared/components/modal/modal';
+import { ButtonComponent } from '../../../shared/components/button/button';
 
 interface TableWithGuests extends TableSummary {
   guests: AdminReservation[];
@@ -19,7 +20,7 @@ type OccupancyFilter = 'all' | 'full' | 'available' | 'empty';
 @Component({
   selector: 'app-admin-tables',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, ModalComponent],
+  imports: [CommonModule, FormsModule, IconComponent, ModalComponent, ButtonComponent],
   templateUrl: './tables.html',
 })
 export class AdminTablesComponent implements OnInit {
@@ -61,6 +62,13 @@ export class AdminTablesComponent implements OnInit {
   readonly movingReservationId = signal<string | null>(null);
   moveDraft = { tableId: '', seatNumber: 1 };
   readonly moving = signal(false);
+
+  // Changer le statut (validée / en attente) d'une réservation.
+  readonly togglingStatusId = signal<string | null>(null);
+
+  // Supprimer un invité d'une table (avec confirmation).
+  readonly deleting = signal<AdminReservation | null>(null);
+  readonly deletingBusy = signal(false);
 
   // Affecter un invité attendu (sans compte) à une place d'une table admin-only.
   readonly assigningTable = signal<TableWithGuests | null>(null);
@@ -147,6 +155,39 @@ export class AdminTablesComponent implements OnInit {
       // Message d'erreur précis déjà affiché par l'intercepteur HTTP global.
     } finally {
       this.moving.set(false);
+    }
+  }
+
+  async toggleStatus(reservation: AdminReservation): Promise<void> {
+    const nextStatus: ReservationStatus = reservation.status === 'validated' ? 'pending' : 'validated';
+    this.togglingStatusId.set(reservation._id);
+    try {
+      await this.adminService.setReservationStatus(reservation._id, nextStatus);
+      this.toast.show(
+        nextStatus === 'validated' ? 'Réservation validée, email envoyé à l\'invité.' : 'Réservation remise en attente.',
+        'success'
+      );
+      await this.load();
+    } catch {
+      // Message d'erreur précis déjà affiché par l'intercepteur HTTP global.
+    } finally {
+      this.togglingStatusId.set(null);
+    }
+  }
+
+  async confirmRemove(): Promise<void> {
+    const reservation = this.deleting();
+    if (!reservation) return;
+    this.deletingBusy.set(true);
+    try {
+      await this.adminService.deleteReservation(reservation._id);
+      this.toast.show('Invité retiré de la table.', 'success');
+      this.deleting.set(null);
+      await this.load();
+    } catch {
+      // Message d'erreur précis déjà affiché par l'intercepteur HTTP global.
+    } finally {
+      this.deletingBusy.set(false);
     }
   }
 
